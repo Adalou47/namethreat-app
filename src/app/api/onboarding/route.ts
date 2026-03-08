@@ -36,6 +36,21 @@ const SIZE_BAND_TO_DB: Record<string, string> = {
   "2000+": "2000_plus",
 };
 
+/** Map frontend industry (capitalised) to DB industry_check constraint (lowercase) */
+const INDUSTRY_TO_DB: Record<string, string> = {
+  Construction: "construction",
+  Pharma: "pharma",
+  Legal: "legal",
+  "IT/Tech": "it_tech",
+  Finance: "finance",
+  Healthcare: "healthcare",
+  Manufacturing: "manufacturing",
+  Retail: "retail",
+  Education: "education",
+  Government: "government",
+  Other: "other",
+};
+
 /** Map frontend employee count to organisations customer_type for direct */
 function directCustomerType(size_band: string): "direct_smb" | "direct_midmarket" {
   if (size_band === "1-50") return "direct_smb";
@@ -201,12 +216,13 @@ export async function POST(req: NextRequest) {
 
     const directSizeBand = SIZE_BAND_TO_DB[size_band] ?? size_band;
     const orgCustomerType = directCustomerType(size_band);
+    const industryDb = INDUSTRY_TO_DB[industry] ?? industry.toLowerCase().replace(/\s*\/\s*/g, "_").replace(/-/g, "_");
 
     const directOrganisationData = {
       name: organisation_name,
       domain: domain ?? null,
       country,
-      industry,
+      industry: industryDb,
       size_band: directSizeBand,
       customer_type: orgCustomerType as "direct_smb" | "direct_midmarket",
       onboarding_complete: false,
