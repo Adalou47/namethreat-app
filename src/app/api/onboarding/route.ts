@@ -27,6 +27,30 @@ type MspsRow = Database["public"]["Tables"]["msps"]["Row"];
 type OrganisationRow = Database["public"]["Tables"]["organisations"]["Row"];
 type UserRow = Database["public"]["Tables"]["users"]["Row"];
 
+/** Map frontend size_band (employee count) to DB constraint values */
+const SIZE_BAND_TO_DB: Record<string, string> = {
+  "1-50": "1_50",
+  "51-200": "51_200",
+  "201-500": "201_500",
+  "501-2000": "501_2000",
+  "2000+": "2000_plus",
+};
+
+/** Map frontend employee count to organisations customer_type for direct */
+function directCustomerType(size_band: string): "direct_smb" | "direct_midmarket" {
+  if (size_band === "1-50") return "direct_smb";
+  return "direct_midmarket"; // 51-200, 201-500, 501-2000, 2000+
+}
+
+/** Map MSP client count bands to DB size_band (same allowed values as direct) */
+const MSP_SIZE_BAND_TO_DB: Record<string, string> = {
+  "1-10": "1_50",
+  "11-25": "1_50",
+  "26-50": "51_200",
+  "51-100": "51_200",
+  "100+": "2000_plus",
+};
+
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
 
@@ -89,14 +113,16 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      const mspSizeBand = MSP_SIZE_BAND_TO_DB[size_band] ?? size_band;
+
       const { data: organisation, error: orgError } = await supabase
         .from("organisations")
         .insert({
           msp_id: msp.id,
           name: organisation_name,
           country,
-          size_band,
-          customer_type: "msp",
+          size_band: mspSizeBand,
+          customer_type: "msp_managed",
           onboarding_complete: false,
         })
         .select()
@@ -157,6 +183,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const directSizeBand = SIZE_BAND_TO_DB[size_band] ?? size_band;
+    const orgCustomerType = directCustomerType(size_band);
+
     const { data: organisation, error: orgError } = await supabase
       .from("organisations")
       .insert({
@@ -164,8 +193,8 @@ export async function POST(req: NextRequest) {
         domain: domain ?? null,
         country,
         industry,
-        size_band,
-        customer_type: "direct",
+        size_band: directSizeBand,
+        customer_type: orgCustomerType,
         onboarding_complete: false,
       })
       .select()

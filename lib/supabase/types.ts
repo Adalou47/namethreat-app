@@ -35,7 +35,7 @@ export type OrganisationsRow = {
   language: string | null;
   industry: string | null;
   size_band: string | null;
-  customer_type: "msp" | "direct" | null;
+  customer_type: "msp_managed" | "direct_smb" | "direct_midmarket" | "enterprise" | null;
   compliance_frameworks: Json | null;
   subscription_plan: string | null;
   subscription_seats: number | null;
@@ -204,7 +204,7 @@ export type Database = {
           language?: string | null;
           industry?: string | null;
           size_band?: string | null;
-          customer_type?: "msp" | "direct" | null;
+          customer_type?: "msp_managed" | "direct_smb" | "direct_midmarket" | "enterprise" | null;
           compliance_frameworks?: Json | null;
           subscription_plan?: string | null;
           subscription_seats?: number | null;
