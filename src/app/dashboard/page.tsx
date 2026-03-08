@@ -20,7 +20,7 @@ export default async function DashboardPage() {
   }
 
   const supabase = createSupabaseServiceClient();
-  const { data: dbUser } = await supabase
+  let { data: dbUser } = await supabase
     .from("users")
     .select("organisation_id")
     .eq("clerk_user_id", userId)
@@ -28,11 +28,23 @@ export default async function DashboardPage() {
 
   if (!dbUser || !dbUser.organisation_id) {
     const clerkUser = await currentUser();
-    const signupType = (clerkUser?.publicMetadata as { signup_type?: string } | undefined)?.signup_type;
-    if (signupType === "company") {
-      redirect("/onboarding/company");
+    const metadata = clerkUser?.publicMetadata as { onboarding_complete?: boolean; signup_type?: string } | undefined;
+    if (metadata?.onboarding_complete === true) {
+      await new Promise((r) => setTimeout(r, 300));
+      const refetch = await supabase
+        .from("users")
+        .select("organisation_id")
+        .eq("clerk_user_id", userId)
+        .maybeSingle();
+      dbUser = refetch.data;
     }
-    redirect("/onboarding/msp");
+    if (!dbUser || !dbUser.organisation_id) {
+      const signupType = metadata?.signup_type;
+      if (signupType === "company") {
+        redirect("/onboarding/company");
+      }
+      redirect("/onboarding/msp");
+    }
   }
 
   return (

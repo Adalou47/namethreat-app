@@ -56,6 +56,7 @@ export default function OnboardingMspPage() {
 
   const handleSubmit = async () => {
     setSubmitting(true);
+    setErrors({});
     try {
       const res = await fetch("/api/onboarding", {
         method: "POST",
@@ -70,13 +71,16 @@ export default function OnboardingMspPage() {
           industry: null,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setErrors({ msp_name: data.error || "Something went wrong." });
+        setErrors({ msp_name: (data as { error?: string }).error || "Something went wrong." });
+        return;
+      }
+      if ((data as { success?: boolean }).success !== true) {
+        setErrors({ msp_name: (data as { error?: string }).error || "Setup did not complete. Please try again." });
         return;
       }
       router.push("/dashboard");
-      router.refresh();
     } catch {
       setErrors({ msp_name: "Something went wrong." });
     } finally {

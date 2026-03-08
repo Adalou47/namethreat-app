@@ -72,6 +72,7 @@ export default function OnboardingCompanyPage() {
 
   const handleSubmit = async () => {
     setSubmitting(true);
+    setErrors({});
     try {
       const res = await fetch("/api/onboarding", {
         method: "POST",
@@ -85,13 +86,16 @@ export default function OnboardingCompanyPage() {
           size_band: form.employee_count,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setErrors({ company_name: data.error || "Something went wrong." });
+        setErrors({ company_name: (data as { error?: string }).error || "Something went wrong." });
+        return;
+      }
+      if ((data as { success?: boolean }).success !== true) {
+        setErrors({ company_name: (data as { error?: string }).error || "Setup did not complete. Please try again." });
         return;
       }
       router.push("/dashboard");
-      router.refresh();
     } catch {
       setErrors({ company_name: "Something went wrong." });
     } finally {
