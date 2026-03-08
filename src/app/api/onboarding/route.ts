@@ -52,39 +52,42 @@ const MSP_SIZE_BAND_TO_DB: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const payload = (await req.json()) as Partial<OnboardingPayload>;
-  const { customer_type } = payload;
-
-  if (!customer_type || (customer_type !== "msp" && customer_type !== "direct")) {
-    return NextResponse.json(
-      { error: "Invalid or missing customer_type" },
-      { status: 400 },
-    );
-  }
-
-  const clerkUser = await currentUser();
-  if (!clerkUser) {
-    return NextResponse.json({ error: "User not found" }, { status: 401 });
-  }
-
-  const email =
-    clerkUser.primaryEmailAddress?.emailAddress ??
-    clerkUser.emailAddresses[0]?.emailAddress ??
-    null;
-  const fullName =
-    clerkUser.fullName ??
-    [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") ??
-    null;
-
-  const supabase = createSupabaseServiceClient();
-
   try {
+    console.log("Step 1: Getting auth session");
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    console.log("Step 2: Got user", userId);
+
+    const payload = (await req.json()) as Partial<OnboardingPayload>;
+    const { customer_type } = payload;
+
+    if (!customer_type || (customer_type !== "msp" && customer_type !== "direct")) {
+      return NextResponse.json(
+        { error: "Invalid or missing customer_type" },
+        { status: 400 },
+      );
+    }
+
+    const clerkUser = await currentUser();
+    if (!clerkUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 401 });
+    }
+
+    const email =
+      clerkUser.primaryEmailAddress?.emailAddress ??
+      clerkUser.emailAddresses[0]?.emailAddress ??
+      null;
+    const fullName =
+      clerkUser.fullName ??
+      [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") ??
+      null;
+
+    const supabase = createSupabaseServiceClient();
+
     if (customer_type === "msp") {
       const { organisation_name, country, size_band, website, phone } = payload;
       if (!organisation_name || !country || !size_band) {
@@ -94,6 +97,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      console.log("Step 2b (MSP): Inserting MSP");
       const { data: msp, error: mspError } = await supabase
         .from("msps")
         .insert({
@@ -112,9 +116,11 @@ export async function POST(req: NextRequest) {
           { status: 500 },
         );
       }
+      console.log("Step 2b (MSP): MSP created", msp?.id);
 
       const mspSizeBand = MSP_SIZE_BAND_TO_DB[size_band] ?? size_band;
 
+      console.log("Step 3: Inserting organisation");
       const { data: organisation, error: orgError } = await supabase
         .from("organisations")
         .insert({
@@ -134,7 +140,9 @@ export async function POST(req: NextRequest) {
           { status: 500 },
         );
       }
+      console.log("Step 4: Organisation created", organisation?.id);
 
+      console.log("Step 5: Inserting user");
       const { data: user, error: userError } = await supabase
         .from("users")
         .insert({
@@ -156,12 +164,15 @@ export async function POST(req: NextRequest) {
           { status: 500 },
         );
       }
+      console.log("Step 6: User created", user?.id);
 
+      console.log("Step 7: Updating Clerk metadata");
       const clerk = await clerkClient();
       await clerk.users.updateUserMetadata(userId, {
         publicMetadata: { signup_type: "msp", onboarding_complete: true, organisation_id: organisation.id },
       }).catch(() => {});
 
+      console.log("Step 8: Complete (MSP)");
       return NextResponse.json(
         {
           success: true,
@@ -186,6 +197,7 @@ export async function POST(req: NextRequest) {
     const directSizeBand = SIZE_BAND_TO_DB[size_band] ?? size_band;
     const orgCustomerType = directCustomerType(size_band);
 
+    console.log("Step 3: Inserting organisation");
     const { data: organisation, error: orgError } = await supabase
       .from("organisations")
       .insert({
@@ -206,7 +218,9 @@ export async function POST(req: NextRequest) {
         { status: 500 },
       );
     }
+    console.log("Step 4: Organisation created", organisation?.id);
 
+    console.log("Step 5: Inserting user");
     const { data: user, error: userError } = await supabase
       .from("users")
       .insert({
@@ -228,12 +242,15 @@ export async function POST(req: NextRequest) {
         { status: 500 },
       );
     }
+    console.log("Step 6: User created", user?.id);
 
+    console.log("Step 7: Updating Clerk metadata");
     const clerk = await clerkClient();
     await clerk.users.updateUserMetadata(userId, {
       publicMetadata: { signup_type: "company", onboarding_complete: true, organisation_id: organisation.id },
     }).catch(() => {});
 
+    console.log("Step 8: Complete (direct)");
     return NextResponse.json(
       {
         success: true,
@@ -245,8 +262,14 @@ export async function POST(req: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unexpected error occurred";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const err = error instanceof Error ? error : new Error(String(error));
+    console.error("Onboarding failed at:", err.message, error);
+    return NextResponse.json(
+      {
+        error: err.message,
+        stack: err.stack,
+      },
+      { status: 500 },
+    );
   }
 }
