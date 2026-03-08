@@ -120,25 +120,30 @@ export async function POST(req: NextRequest) {
 
       const mspSizeBand = MSP_SIZE_BAND_TO_DB[size_band] ?? size_band;
 
+      const mspOrganisationData = {
+        msp_id: msp.id,
+        name: organisation_name,
+        country,
+        size_band: mspSizeBand,
+        customer_type: "msp_managed" as const,
+        onboarding_complete: false,
+      };
       console.log("Step 3: Inserting organisation");
+      console.log("Organisation data being inserted:", JSON.stringify(mspOrganisationData, null, 2));
       const { data: organisation, error: orgError } = await supabase
         .from("organisations")
-        .insert({
-          msp_id: msp.id,
-          name: organisation_name,
-          country,
-          size_band: mspSizeBand,
-          customer_type: "msp_managed",
-          onboarding_complete: false,
-        })
+        .insert(mspOrganisationData)
         .select()
         .single<OrganisationRow>();
 
-      if (orgError || !organisation) {
-        return NextResponse.json(
-          { error: orgError?.message ?? "Failed to create organisation" },
-          { status: 500 },
-        );
+      if (orgError) {
+        const err = orgError as { message: string; details?: string; hint?: string };
+        console.error("Organisation insert error:", err.message, err.details, err.hint);
+        console.error("Organisation insert error full:", orgError);
+        throw new Error(orgError.message);
+      }
+      if (!organisation) {
+        throw new Error("Failed to create organisation");
       }
       console.log("Step 4: Organisation created", organisation?.id);
 
@@ -197,26 +202,31 @@ export async function POST(req: NextRequest) {
     const directSizeBand = SIZE_BAND_TO_DB[size_band] ?? size_band;
     const orgCustomerType = directCustomerType(size_band);
 
+    const directOrganisationData = {
+      name: organisation_name,
+      domain: domain ?? null,
+      country,
+      industry,
+      size_band: directSizeBand,
+      customer_type: orgCustomerType as "direct_smb" | "direct_midmarket",
+      onboarding_complete: false,
+    };
     console.log("Step 3: Inserting organisation");
+    console.log("Organisation data being inserted:", JSON.stringify(directOrganisationData, null, 2));
     const { data: organisation, error: orgError } = await supabase
       .from("organisations")
-      .insert({
-        name: organisation_name,
-        domain: domain ?? null,
-        country,
-        industry,
-        size_band: directSizeBand,
-        customer_type: orgCustomerType,
-        onboarding_complete: false,
-      })
+      .insert(directOrganisationData)
       .select()
       .single<OrganisationRow>();
 
-    if (orgError || !organisation) {
-      return NextResponse.json(
-        { error: orgError?.message ?? "Failed to create organisation" },
-        { status: 500 },
-      );
+    if (orgError) {
+      const err = orgError as { message: string; details?: string; hint?: string };
+      console.error("Organisation insert error:", err.message, err.details, err.hint);
+      console.error("Organisation insert error full:", orgError);
+      throw new Error(orgError.message);
+    }
+    if (!organisation) {
+      throw new Error("Failed to create organisation");
     }
     console.log("Step 4: Organisation created", organisation?.id);
 
