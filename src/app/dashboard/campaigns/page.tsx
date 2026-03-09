@@ -19,16 +19,40 @@ export default async function CampaignsPage() {
   const supabase = createSupabaseServiceClient();
   const { data: dbUser } = await supabase
     .from("users")
-    .select("organisation_id")
+    .select("organisation_id, role, msp_id")
     .eq("clerk_user_id", userId)
     .maybeSingle();
   if (!dbUser?.organisation_id) redirect("/onboarding/msp");
 
+  const isMspAdmin = dbUser.role === "msp_admin" && dbUser.msp_id;
+  let orgIds: string[] = [dbUser.organisation_id];
+
+  if (isMspAdmin) {
+    const { data: clientOrgs } = await supabase
+      .from("organisations")
+      .select("id")
+      .eq("msp_id", dbUser.msp_id);
+    orgIds = (clientOrgs ?? []).map((o) => o.id);
+  }
+
   const { data: campaigns } = await supabase
     .from("phishing_campaigns")
-    .select("id, name, status, total_targets, total_sent, total_clicked, click_rate, created_at")
-    .eq("organisation_id", dbUser.organisation_id)
+    .select("id, name, status, total_targets, total_sent, total_clicked, click_rate, created_at, organisation_id")
+    .in("organisation_id", orgIds)
     .order("created_at", { ascending: false });
+
+  let orgNames: Record<string, string> = {};
+  if (isMspAdmin && campaigns?.length) {
+    const ids = [...new Set((campaigns ?? []).map((c) => c.organisation_id).filter(Boolean))];
+    const { data: orgs } = await supabase
+      .from("organisations")
+      .select("id, name")
+      .in("id", ids);
+    orgNames = (orgs ?? []).reduce<Record<string, string>>((acc, o) => {
+      acc[o.id] = o.name ?? "—";
+      return acc;
+    }, {});
+  }
 
   return (
     <div className="space-y-6">
@@ -68,6 +92,9 @@ export default async function CampaignsPage() {
             <thead>
               <tr className="border-b border-[#e5e5e5]">
                 <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Name</th>
+                {isMspAdmin && (
+                  <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Client</th>
+                )}
                 <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Status</th>
                 <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Targets</th>
                 <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Sent</th>
@@ -91,6 +118,16 @@ export default async function CampaignsPage() {
                       {c.name ?? "Unnamed"}
                     </Link>
                   </td>
+                  {isMspAdmin && (
+                    <td className="py-3 pr-4 text-[#6b6b6b]">
+                      <Link
+                        href={`/dashboard/clients/${c.organisation_id}`}
+                        className="hover:underline"
+                      >
+                        {orgNames[c.organisation_id ?? ""] ?? "—"}
+                      </Link>
+                    </td>
+                  )}
                   <td className="py-3 pr-4">
                     <span
                       className={`rounded-[4px] px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[c.status ?? ""] ?? "bg-[#e5e5e5] text-[#6b6b6b]"}`}

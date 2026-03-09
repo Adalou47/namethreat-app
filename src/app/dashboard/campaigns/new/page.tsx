@@ -6,7 +6,7 @@ import { CampaignWizard } from "./campaign-wizard";
 export default async function NewCampaignPage({
   searchParams,
 }: {
-  searchParams: Promise<{ template_id?: string }>;
+  searchParams: Promise<{ template_id?: string; organisation_id?: string }>;
 }) {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
@@ -14,13 +14,25 @@ export default async function NewCampaignPage({
   const supabase = createSupabaseServiceClient();
   const { data: dbUser } = await supabase
     .from("users")
-    .select("organisation_id")
+    .select("organisation_id, role, msp_id")
     .eq("clerk_user_id", userId)
     .maybeSingle();
   if (!dbUser?.organisation_id) redirect("/onboarding/msp");
 
   const params = await searchParams;
   const preselectedTemplateId = params.template_id ?? null;
+  const paramOrgId = params.organisation_id ?? null;
+
+  let organisationId: string = dbUser.organisation_id;
+  if (paramOrgId && dbUser.role === "msp_admin" && dbUser.msp_id) {
+    const { data: org } = await supabase
+      .from("organisations")
+      .select("id")
+      .eq("id", paramOrgId)
+      .eq("msp_id", dbUser.msp_id)
+      .single();
+    if (org) organisationId = org.id;
+  }
 
   let templates: { id: string; name: string | null; category: string | null; difficulty: string | null; target_country: string | null; language: string | null }[] = [];
   let sendingDomains: { id: string; domain: string | null; reputation_score: number | null }[] = [];
@@ -39,7 +51,7 @@ export default async function NewCampaignPage({
       supabase
         .from("users")
         .select("department")
-        .eq("organisation_id", dbUser.organisation_id)
+        .eq("organisation_id", organisationId)
         .eq("role", "employee")
         .not("department", "is", null),
     ]);
@@ -61,7 +73,7 @@ export default async function NewCampaignPage({
         </p>
       </header>
       <CampaignWizard
-        organisationId={dbUser.organisation_id}
+        organisationId={organisationId}
         userId={userId}
         templates={templates ?? []}
         sendingDomains={sendingDomains ?? []}

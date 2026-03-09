@@ -17,7 +17,7 @@ export default async function DashboardLayout({
   const supabase = createSupabaseServiceClient();
   let { data: dbUser } = await supabase
     .from("users")
-    .select("id, organisation_id, email, full_name, role")
+    .select("id, organisation_id, email, full_name, role, msp_id")
     .eq("clerk_user_id", userId)
     .maybeSingle();
 
@@ -30,7 +30,7 @@ export default async function DashboardLayout({
       await new Promise((r) => setTimeout(r, 300));
       const refetch = await supabase
         .from("users")
-        .select("id, organisation_id, email, full_name, role")
+        .select("id, organisation_id, email, full_name, role, msp_id")
         .eq("clerk_user_id", userId)
         .maybeSingle();
       dbUser = refetch.data;
@@ -44,17 +44,35 @@ export default async function DashboardLayout({
     }
   }
 
-  const { data: organisation } = await supabase
-    .from("organisations")
-    .select("name")
-    .eq("id", dbUser.organisation_id)
-    .single();
+  const role = dbUser.role ?? "";
+  const isMspAdmin = role === "msp_admin";
 
-  const orgName = organisation?.name ?? "Organisation";
+  let displayName: string;
+  if (isMspAdmin && dbUser.msp_id) {
+    const { data: msp } = await supabase
+      .from("msps")
+      .select("name")
+      .eq("id", dbUser.msp_id)
+      .single();
+    displayName = msp?.name ?? "Dashboard";
+  } else {
+    const { data: organisation } = await supabase
+      .from("organisations")
+      .select("name")
+      .eq("id", dbUser.organisation_id)
+      .single();
+    displayName = organisation?.name ?? "Organisation";
+  }
+
   const userEmail = dbUser.email ?? "";
 
   return (
-    <DashboardShell orgName={orgName} userEmail={userEmail}>
+    <DashboardShell
+      orgName={displayName}
+      userEmail={userEmail}
+      role={role}
+      mspId={dbUser.msp_id ?? undefined}
+    >
       {children}
     </DashboardShell>
   );

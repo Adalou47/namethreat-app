@@ -43,14 +43,25 @@ export default async function DashboardPage() {
   // —— msp_admin: all organisations where msp_id = user.msp_id, aggregated counts ——
   if (isMspAdmin) {
     const mspId = user.msp_id;
+    let mspName = "";
+    if (mspId) {
+      const { data: msp } = await supabase
+        .from("msps")
+        .select("name")
+        .eq("id", mspId)
+        .single();
+      mspName = msp?.name ?? "";
+    }
+
     if (!mspId) {
       return (
         <DashboardMspView
+          mspName={mspName}
           totalClients={0}
           totalEmployees={0}
           totalActiveCampaigns={0}
           clientOrgs={[]}
-          roleLabel={roleLabel}
+          recentCampaigns={[]}
         />
       );
     }
@@ -64,11 +75,12 @@ export default async function DashboardPage() {
     if (orgIds.length === 0) {
       return (
         <DashboardMspView
+          mspName={mspName}
           totalClients={0}
           totalEmployees={0}
           totalActiveCampaigns={0}
           clientOrgs={[]}
-          roleLabel={roleLabel}
+          recentCampaigns={[]}
         />
       );
     }
@@ -76,6 +88,7 @@ export default async function DashboardPage() {
     const [
       { data: allEmployees },
       { count: totalActiveCampaigns },
+      { data: recentCampaigns },
     ] = await Promise.all([
       supabase
         .from("users")
@@ -87,6 +100,12 @@ export default async function DashboardPage() {
         .select("*", { count: "exact", head: true })
         .in("organisation_id", orgIds)
         .eq("status", "active"),
+      supabase
+        .from("phishing_campaigns")
+        .select("id, name, status, organisation_id, created_at")
+        .in("organisation_id", orgIds)
+        .order("created_at", { ascending: false })
+        .limit(5),
     ]);
 
     const totalEmployees = (allEmployees ?? []).length;
@@ -107,11 +126,12 @@ export default async function DashboardPage() {
 
     return (
       <DashboardMspView
+        mspName={mspName}
         totalClients={totalClients}
         totalEmployees={totalEmployees}
         totalActiveCampaigns={totalActiveCampaigns ?? 0}
         clientOrgs={clientOrgsList}
-        roleLabel={roleLabel}
+        recentCampaigns={recentCampaigns ?? []}
       />
     );
   }
@@ -150,29 +170,36 @@ export default async function DashboardPage() {
   );
 }
 
-// MSP dashboard: aggregated stats + client organisations list (name + employee count)
+type RecentCampaignItem = {
+  id: string;
+  name: string | null;
+  status: string | null;
+  organisation_id: string | null;
+  created_at: string | null;
+};
+
+// MSP dashboard: welcome + stats + client list + recent activity
 function DashboardMspView({
+  mspName,
   totalClients,
   totalEmployees,
   totalActiveCampaigns,
   clientOrgs,
-  roleLabel,
+  recentCampaigns,
 }: {
+  mspName: string;
   totalClients: number;
   totalEmployees: number;
   totalActiveCampaigns: number;
   clientOrgs: ClientOrgItem[];
-  roleLabel: string;
+  recentCampaigns: RecentCampaignItem[];
 }) {
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-        <p className="text-sm text-[#6b6b6b]">
-          Signed in as{" "}
-          <span className="font-medium capitalize text-[#000000]">
-            {roleLabel}
-          </span>
-        </p>
+      <header>
+        <h1 className="text-xl font-semibold text-[#000000]">
+          Welcome back{mspName ? `, ${mspName}` : ""}
+        </h1>
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -222,18 +249,52 @@ function DashboardMspView({
         </div>
       </section>
 
-      <section className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-6">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.15em] text-[#000000]">
-          Client Organisations
-        </h2>
-        {clientOrgs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm font-medium text-[#000000]">No client organisations yet</p>
-            <p className="mt-1 text-sm text-[#6b6b6b]">
-              Add clients to see them here.
+      {clientOrgs.length === 0 && (
+        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-12 text-center">
+          <Building2 className="mx-auto mb-4 h-14 w-14 text-[#6b6b6b]" />
+          <h2 className="text-lg font-semibold text-[#000000]">Add your first client</h2>
+          <p className="mt-2 text-sm text-[#6b6b6b]">
+            Add your first client to get started
+          </p>
+          <Link
+            href="/dashboard/clients/new"
+            className="mt-6 inline-block rounded-[4px] bg-[#000000] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+          >
+            Add Client
+          </Link>
+          <div className="mx-auto mt-10 max-w-md space-y-4 rounded-[6px] border border-[#e5e5e5] bg-white p-6 text-left">
+            <p className="text-sm font-medium text-[#000000]">
+              How easy it is to get started:
             </p>
+            <ol className="space-y-3 text-sm text-[#6b6b6b]">
+              <li className="flex gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e5e5e5] text-xs font-medium text-[#000000]">
+                  1
+                </span>
+                Add client details (company name, domain, country, industry)
+              </li>
+              <li className="flex gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e5e5e5] text-xs font-medium text-[#000000]">
+                  2
+                </span>
+                Connect Microsoft Entra or import CSV to add employees
+              </li>
+              <li className="flex gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e5e5e5] text-xs font-medium text-[#000000]">
+                  3
+                </span>
+                Launch your first phishing campaign for the client
+              </li>
+            </ol>
           </div>
-        ) : (
+        </div>
+      )}
+
+      {clientOrgs.length > 0 && (
+        <section className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-6">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.15em] text-[#000000]">
+            Client Organisations
+          </h2>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
@@ -244,9 +305,11 @@ function DashboardMspView({
               </thead>
               <tbody>
                 {clientOrgs.map(({ id, name, employeeCount }) => (
-                  <tr key={id} className="border-b border-[#e5e5e5] last:border-0">
+                  <tr key={id} className="border-b border-[#e5e5e5] last:border-0 hover:bg-white/50">
                     <td className="py-3 pr-4 font-medium text-[#000000]">
-                      {name ?? "—"}
+                      <Link href={`/dashboard/clients/${id}`} className="hover:underline">
+                        {name ?? "—"}
+                      </Link>
                     </td>
                     <td className="py-3 text-[#000000]">{employeeCount}</td>
                   </tr>
@@ -254,58 +317,85 @@ function DashboardMspView({
               </tbody>
             </table>
           </div>
-        )}
-      </section>
+        </section>
+      )}
 
-      <section>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.15em] text-[#000000]">
-          Quick Actions
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-5">
-            <h3 className="text-base font-semibold text-[#000000]">
-              Add Client
-            </h3>
-            <p className="mt-2 text-sm text-[#6b6b6b]">
-              Onboard a new client organisation
-            </p>
-            <Link
-              href="/dashboard/employees"
-              className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
-            >
-              Get Started
-            </Link>
+      {recentCampaigns.length > 0 && (
+        <section className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-6">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.15em] text-[#000000]">
+            Recent activity
+          </h2>
+          <ul className="space-y-2">
+            {recentCampaigns.map((c) => (
+              <li key={c.id} className="flex items-center justify-between text-sm">
+                <Link
+                  href={`/dashboard/campaigns/${c.id}`}
+                  className="font-medium text-[#000000] hover:underline"
+                >
+                  {c.name ?? "Unnamed campaign"}
+                </Link>
+                <span className="text-[#6b6b6b]">
+                  {c.created_at
+                    ? new Date(c.created_at).toLocaleDateString()
+                    : "—"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {clientOrgs.length > 0 && (
+        <section>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.15em] text-[#000000]">
+            Quick Actions
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-5">
+              <h3 className="text-base font-semibold text-[#000000]">
+                Add Client
+              </h3>
+              <p className="mt-2 text-sm text-[#6b6b6b]">
+                Onboard a new client organisation
+              </p>
+              <Link
+                href="/dashboard/clients/new"
+                className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+              >
+                Get Started
+              </Link>
+            </div>
+            <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-5">
+              <h3 className="text-base font-semibold text-[#000000]">
+                Launch Campaign
+              </h3>
+              <p className="mt-2 text-sm text-[#6b6b6b]">
+                Send a phishing simulation to a client
+              </p>
+              <Link
+                href="/dashboard/campaigns"
+                className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+              >
+                Get Started
+              </Link>
+            </div>
+            <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-5">
+              <h3 className="text-base font-semibold text-[#000000]">
+                View Reports
+              </h3>
+              <p className="mt-2 text-sm text-[#6b6b6b]">
+                Download security reports for compliance
+              </p>
+              <Link
+                href="/dashboard/reports"
+                className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+              >
+                Get Started
+              </Link>
+            </div>
           </div>
-          <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-5">
-            <h3 className="text-base font-semibold text-[#000000]">
-              Launch Campaign
-            </h3>
-            <p className="mt-2 text-sm text-[#6b6b6b]">
-              Send a phishing simulation to your team
-            </p>
-            <Link
-              href="/dashboard/campaigns"
-              className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
-            >
-              Get Started
-            </Link>
-          </div>
-          <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-5">
-            <h3 className="text-base font-semibold text-[#000000]">
-              View Reports
-            </h3>
-            <p className="mt-2 text-sm text-[#6b6b6b]">
-              Download security reports for compliance
-            </p>
-            <Link
-              href="/dashboard/reports"
-              className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
-            >
-              Get Started
-            </Link>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

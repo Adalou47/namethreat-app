@@ -7,10 +7,9 @@ import { UserButton, SignOutButton } from "@clerk/nextjs";
 import {
   LayoutDashboard,
   Users,
+  Building2,
   Mail,
   LayoutGrid,
-  Target,
-  BookOpen,
   Shield,
   BarChart3,
   Settings,
@@ -19,27 +18,41 @@ import {
   X,
 } from "lucide-react";
 
-const NAV_ITEMS: { label: string; href: string; icon: React.ComponentType<{ className?: string }> }[] = [
+const MSP_NAV_ITEMS: { label: string; href: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Clients", href: "/dashboard/clients", icon: Building2 },
+  { label: "Campaigns", href: "/dashboard/campaigns", icon: Mail },
+  { label: "Templates", href: "/dashboard/templates", icon: LayoutGrid },
+  { label: "Reports", href: "/dashboard/reports", icon: BarChart3 },
+  { label: "Settings", href: "/dashboard/settings", icon: Settings },
+];
+
+const ORG_NAV_ITEMS: { label: string; href: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Employees", href: "/dashboard/employees", icon: Users },
   { label: "Campaigns", href: "/dashboard/campaigns", icon: Mail },
   { label: "Templates", href: "/dashboard/templates", icon: LayoutGrid },
-  { label: "Phishing Results", href: "/dashboard/results", icon: Target },
-  { label: "Training", href: "/dashboard/training", icon: BookOpen },
   { label: "Domain Intelligence", href: "/dashboard/domains", icon: Shield },
   { label: "Reports", href: "/dashboard/reports", icon: BarChart3 },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
+function getNavItems(role: string) {
+  return role === "msp_admin" ? MSP_NAV_ITEMS : ORG_NAV_ITEMS;
+}
+
 type DashboardShellProps = {
   orgName: string;
   userEmail: string;
+  role?: string;
+  mspId?: string;
   children: React.ReactNode;
 };
 
-export function DashboardShell({ orgName, userEmail, children }: DashboardShellProps) {
+export function DashboardShell({ orgName, userEmail, role = "", mspId, children }: DashboardShellProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navItems = getNavItems(role);
 
   return (
     <div className="flex min-h-screen bg-[#ffffff] text-[#000000]">
@@ -70,7 +83,7 @@ export function DashboardShell({ orgName, userEmail, children }: DashboardShellP
             </button>
           </div>
           <nav className="flex-1 space-y-0.5 px-3 py-4">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
               const Icon = item.icon;
               return (
