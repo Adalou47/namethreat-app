@@ -107,6 +107,21 @@ export type PhishingCampaignsRow = {
   updated_at: string | null;
 };
 
+export type PhishingResultsRow = {
+  id: string;
+  campaign_id: string;
+  user_id: string;
+  organisation_id: string;
+  email_sent_at: string | null;
+  email_opened_at: string | null;
+  link_clicked_at: string | null;
+  credentials_submitted_at: string | null;
+  reported_at: string | null;
+  outcome: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type PhishingTemplatesRow = {
   id: string;
   name: string | null;
@@ -344,6 +359,12 @@ export type Database = {
         Row: PhishingCampaignsRow;
         Insert: { [K in keyof PhishingCampaignsRow]?: PhishingCampaignsRow[K] };
         Update: Partial<PhishingCampaignsRow>;
+        Relationships: [];
+      };
+      phishing_results: {
+        Row: PhishingResultsRow;
+        Insert: { [K in keyof PhishingResultsRow]?: PhishingResultsRow[K] };
+        Update: Partial<PhishingResultsRow>;
         Relationships: [];
       };
       phishing_templates: {
