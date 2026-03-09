@@ -128,51 +128,18 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const mspSizeBand = MSP_SIZE_BAND_TO_DB[size_band] ?? size_band;
-
-      let mspDomain: string | null = null;
-      if (website?.trim()) {
-        const stripped = website.trim().replace(/^https?:\/\//i, "").replace(/^www\./i, "").split("/")[0];
-        if (stripped) mspDomain = stripped;
-      }
-      if (!mspDomain && email?.includes("@")) {
-        mspDomain = email.split("@")[1]?.trim() ?? null;
-      }
-
-      const mspOrganisationData = {
-        msp_id: msp.id,
-        name: organisation_name,
-        domain: mspDomain,
-        country,
-        industry: "it_tech" as const,
-        size_band: mspSizeBand,
-        customer_type: "msp_managed" as const,
-        onboarding_complete: false,
-      };
-      const { data: organisation, error: orgError } = await supabase
-        .from("organisations")
-        .insert(mspOrganisationData)
-        .select()
-        .single<OrganisationRow>();
-
-      if (orgError) {
-        throw new Error(orgError.message);
-      }
-      if (!organisation) {
-        throw new Error("Failed to create organisation");
-      }
-
+      // MSPs do not have their own organisation; they manage client organisations.
       const { data: user, error: userError } = await supabase
         .from("users")
         .insert({
           clerk_user_id: userId,
-          organisation_id: organisation.id,
+          organisation_id: null,
           msp_id: msp.id,
           email,
           full_name: fullName,
           role: "msp_admin",
           is_active: true,
-          onboarding_complete: false,
+          onboarding_complete: true,
         })
         .select()
         .single<UserRow>();
@@ -186,15 +153,14 @@ export async function POST(req: NextRequest) {
 
       const clerk = await clerkClient();
       await clerk.users.updateUserMetadata(userId, {
-        publicMetadata: { signup_type: "msp", onboarding_complete: true, organisation_id: organisation.id },
+        publicMetadata: { signup_type: "msp", onboarding_complete: true },
       }).catch(() => {});
 
       return NextResponse.json(
         {
           success: true,
-          organisation_id: organisation.id,
+          msp_id: msp.id,
           user_id: user.id,
-          organisation,
           user,
         },
         { status: 201 },

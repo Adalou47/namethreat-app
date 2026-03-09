@@ -29,10 +29,12 @@ export default async function EmployeesPage() {
   const supabase = createSupabaseServiceClient();
   const { data: dbUser } = await supabase
     .from("users")
-    .select("organisation_id")
+    .select("organisation_id, role, msp_id")
     .eq("clerk_user_id", userId)
     .maybeSingle();
-  if (!dbUser?.organisation_id) redirect("/onboarding/msp");
+  if (!dbUser) redirect("/sign-in");
+  if (dbUser.role === "msp_admin" && dbUser.msp_id) redirect("/dashboard");
+  if (!dbUser.organisation_id) redirect("/onboarding/msp");
 
   const organisationId = dbUser.organisation_id;
 

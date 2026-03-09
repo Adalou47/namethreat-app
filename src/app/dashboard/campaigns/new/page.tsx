@@ -17,13 +17,15 @@ export default async function NewCampaignPage({
     .select("organisation_id, role, msp_id")
     .eq("clerk_user_id", userId)
     .maybeSingle();
-  if (!dbUser?.organisation_id) redirect("/onboarding/msp");
+  const hasOrg = dbUser.organisation_id != null;
+  const hasMsp = dbUser.msp_id != null;
+  if (!hasOrg && !hasMsp) redirect("/onboarding/msp");
 
   const params = await searchParams;
   const preselectedTemplateId = params.template_id ?? null;
   const paramOrgId = params.organisation_id ?? null;
 
-  let organisationId: string = dbUser.organisation_id;
+  let organisationId: string | null = dbUser.organisation_id;
   if (paramOrgId && dbUser.role === "msp_admin" && dbUser.msp_id) {
     const { data: org } = await supabase
       .from("organisations")
@@ -32,6 +34,11 @@ export default async function NewCampaignPage({
       .eq("msp_id", dbUser.msp_id)
       .single();
     if (org) organisationId = org.id;
+  }
+
+  if (!organisationId) {
+    if (dbUser.role === "msp_admin") redirect("/dashboard/clients");
+    redirect("/onboarding/msp");
   }
 
   let templates: { id: string; name: string | null; category: string | null; difficulty: string | null; target_country: string | null; language: string | null }[] = [];
@@ -73,7 +80,7 @@ export default async function NewCampaignPage({
         </p>
       </header>
       <CampaignWizard
-        organisationId={organisationId}
+        organisationId={organisationId as string}
         userId={userId}
         templates={templates ?? []}
         sendingDomains={sendingDomains ?? []}

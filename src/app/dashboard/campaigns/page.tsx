@@ -22,17 +22,20 @@ export default async function CampaignsPage() {
     .select("organisation_id, role, msp_id")
     .eq("clerk_user_id", userId)
     .maybeSingle();
-  if (!dbUser?.organisation_id) redirect("/onboarding/msp");
+  const hasOrg = dbUser.organisation_id != null;
+  const hasMsp = dbUser.msp_id != null;
+  if (!hasOrg && !hasMsp) redirect("/onboarding/msp");
 
   const isMspAdmin = dbUser.role === "msp_admin" && dbUser.msp_id;
-  let orgIds: string[] = [dbUser.organisation_id];
-
+  let orgIds: string[];
   if (dbUser.msp_id) {
     const { data: clientOrgs } = await supabase
       .from("organisations")
       .select("id")
       .eq("msp_id", dbUser.msp_id);
     orgIds = (clientOrgs ?? []).map((o) => o.id);
+  } else {
+    orgIds = [dbUser.organisation_id as string];
   }
 
   const { data: campaigns } = await supabase

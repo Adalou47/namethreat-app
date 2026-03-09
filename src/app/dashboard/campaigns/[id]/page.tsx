@@ -22,18 +22,37 @@ export default async function CampaignDetailPage({
   const supabase = createSupabaseServiceClient();
   const { data: dbUser } = await supabase
     .from("users")
-    .select("organisation_id")
+    .select("organisation_id, msp_id")
     .eq("clerk_user_id", userId)
     .maybeSingle();
-  if (!dbUser?.organisation_id) redirect("/onboarding/msp");
+  if (!dbUser || (dbUser.organisation_id == null && dbUser.msp_id == null)) redirect("/onboarding/msp");
 
   const { id } = await params;
-  const { data: campaign } = await supabase
-    .from("phishing_campaigns")
-    .select("*")
-    .eq("id", id)
-    .eq("organisation_id", dbUser.organisation_id)
-    .single();
+  let campaign: { id: string; organisation_id: string | null; [key: string]: unknown } | null = null;
+  if (dbUser.msp_id) {
+    const { data: clientOrgs } = await supabase
+      .from("organisations")
+      .select("id")
+      .eq("msp_id", dbUser.msp_id);
+    const orgIds = (clientOrgs ?? []).map((o) => o.id);
+    if (orgIds.length > 0) {
+      const res = await supabase
+        .from("phishing_campaigns")
+        .select("*")
+        .eq("id", id)
+        .in("organisation_id", orgIds)
+        .maybeSingle();
+      campaign = res.data;
+    }
+  } else if (dbUser.organisation_id) {
+    const res = await supabase
+      .from("phishing_campaigns")
+      .select("*")
+      .eq("id", id)
+      .eq("organisation_id", dbUser.organisation_id)
+      .maybeSingle();
+    campaign = res.data;
+  }
 
   if (!campaign) notFound();
 

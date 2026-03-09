@@ -17,10 +17,10 @@ export default async function TemplatesPage({
   const supabase = createSupabaseServiceClient();
   const { data: dbUser } = await supabase
     .from("users")
-    .select("organisation_id")
+    .select("organisation_id, msp_id")
     .eq("clerk_user_id", userId)
     .maybeSingle();
-  if (!dbUser?.organisation_id) redirect("/onboarding/msp");
+  if (!dbUser || (dbUser.organisation_id == null && dbUser.msp_id == null)) redirect("/onboarding/msp");
 
   const raw = await searchParams;
   const category = typeof raw.category === "string" ? raw.category : Array.isArray(raw.category) ? raw.category[0] : undefined;

@@ -15,18 +15,29 @@ export default async function PhishingResultsPage({
   const supabase = createSupabaseServiceClient();
   const { data: dbUser } = await supabase
     .from("users")
-    .select("organisation_id")
+    .select("organisation_id, role, msp_id")
     .eq("clerk_user_id", userId)
     .maybeSingle();
-  if (!dbUser?.organisation_id) redirect("/onboarding/msp");
+  if (!dbUser || (dbUser.organisation_id == null && dbUser.msp_id == null)) redirect("/onboarding/msp");
 
   const params = await searchParams;
   const campaignIdFilter = params.campaign_id ?? null;
 
+  let orgIds: string[];
+  if (dbUser.msp_id) {
+    const { data: clientOrgs } = await supabase
+      .from("organisations")
+      .select("id")
+      .eq("msp_id", dbUser.msp_id);
+    orgIds = (clientOrgs ?? []).map((o) => o.id);
+  } else {
+    orgIds = [dbUser.organisation_id as string];
+  }
+
   const { data: campaigns } = await supabase
     .from("phishing_campaigns")
     .select("id, name")
-    .eq("organisation_id", dbUser.organisation_id)
+    .in("organisation_id", orgIds)
     .order("created_at", { ascending: false });
 
   const campaignIds = (campaigns ?? []).map((c) => c.id);

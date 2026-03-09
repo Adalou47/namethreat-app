@@ -28,3 +28,19 @@ Imported employees have:
 - is_imported: true
 - clerk_user_id: 'imported:{email}' for CSV
 - clerk_user_id: 'imported:{entra_id}' for Entra
+## MSP Portal — COMPLETED March 9 2026
+
+MSP admins see different navigation than direct companies.
+
+MSP sidebar: Dashboard, Clients, Campaigns, 
+Templates, Reports, Settings
+
+MSP flow:
+- /dashboard/clients → list all client orgs
+- /dashboard/clients/new → add new client
+- /dashboard/clients/[id] → client detail with 
+  employees, campaigns, risk score tabs
+
+API: POST /api/clients/create
+Creates organisation with customer_type: msp_managed
+Links via msp_id to the MSP record

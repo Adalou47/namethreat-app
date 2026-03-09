@@ -11,14 +11,9 @@ export async function POST(request: NextRequest) {
   const supabase = createSupabaseServiceClient();
   const { data: user } = await supabase
     .from("users")
-    .select("id, organisation_id")
+    .select("id, organisation_id, role, msp_id")
     .eq("clerk_user_id", userId)
     .single();
-
-  const organisationId = user?.organisation_id;
-  if (!organisationId) {
-    return NextResponse.json({ error: "Organisation not found" }, { status: 403 });
-  }
 
   let body: {
     organisation_id?: string;
@@ -35,6 +30,20 @@ export async function POST(request: NextRequest) {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
+  let organisationId: string | null = user?.organisation_id ?? null;
+  if (user?.role === "msp_admin" && user?.msp_id && body.organisation_id) {
+    const { data: org } = await supabase
+      .from("organisations")
+      .select("id")
+      .eq("id", body.organisation_id)
+      .eq("msp_id", user.msp_id)
+      .single();
+    if (org) organisationId = org.id;
+  }
+  if (!organisationId) {
+    return NextResponse.json({ error: "Organisation not found" }, { status: 403 });
   }
 
   const name = typeof body.name === "string" ? body.name.trim() : "";

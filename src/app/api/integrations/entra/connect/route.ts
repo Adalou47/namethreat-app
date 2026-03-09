@@ -31,7 +31,11 @@ export async function GET(request: NextRequest) {
   }
 
   if (!organisationId) {
-    return NextResponse.redirect(new URL("/onboarding/company", process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"));
+    const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    if (user?.role === "msp_admin") {
+      return NextResponse.redirect(new URL("/dashboard/clients", base));
+    }
+    return NextResponse.redirect(new URL("/onboarding/company", base));
   }
 
   const clientId = process.env.AZURE_CLIENT_ID;

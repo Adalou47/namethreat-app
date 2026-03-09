@@ -21,7 +21,9 @@ export default async function DashboardLayout({
     .eq("clerk_user_id", userId)
     .maybeSingle();
 
-  if (!dbUser || !dbUser.organisation_id) {
+  const hasOrg = dbUser?.organisation_id != null;
+  const hasMsp = dbUser?.msp_id != null;
+  if (!dbUser || (!hasOrg && !hasMsp)) {
     const clerkUser = await currentUser();
     const metadata = clerkUser?.publicMetadata as
       | { onboarding_complete?: boolean; signup_type?: string }
@@ -35,7 +37,9 @@ export default async function DashboardLayout({
         .maybeSingle();
       dbUser = refetch.data;
     }
-    if (!dbUser || !dbUser.organisation_id) {
+    const hasOrgAfter = dbUser?.organisation_id != null;
+    const hasMspAfter = dbUser?.msp_id != null;
+    if (!dbUser || (!hasOrgAfter && !hasMspAfter)) {
       const signupType = metadata?.signup_type;
       if (signupType === "company") {
         redirect("/onboarding/company");
@@ -45,7 +49,7 @@ export default async function DashboardLayout({
   }
 
   const role = dbUser.role ?? "";
-  const isMspAdmin = role === "msp_admin";
+  const isMspAdmin = role === "msp_admin" && dbUser.msp_id != null;
 
   let displayName: string;
   if (isMspAdmin && dbUser.msp_id) {
@@ -55,13 +59,15 @@ export default async function DashboardLayout({
       .eq("id", dbUser.msp_id)
       .single();
     displayName = msp?.name ?? "Dashboard";
-  } else {
+  } else if (dbUser.organisation_id) {
     const { data: organisation } = await supabase
       .from("organisations")
       .select("name")
       .eq("id", dbUser.organisation_id)
       .single();
     displayName = organisation?.name ?? "Organisation";
+  } else {
+    displayName = "Dashboard";
   }
 
   const userEmail = dbUser.email ?? "";
