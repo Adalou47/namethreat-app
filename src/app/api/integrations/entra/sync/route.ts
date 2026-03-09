@@ -22,6 +22,7 @@ type IntegrationConfig = {
 };
 
 export async function POST(request: NextRequest) {
+  const startedAt = new Date().toISOString();
   let organisationId: string;
   try {
     const body = await request.json();
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
     .from("integrations")
     .select("id, config_json")
     .eq("organisation_id", organisationId)
-    .eq("provider", "microsoft_entra")
+    .eq("integration_type", "microsoft_entra")
     .eq("status", "active")
     .single();
 
@@ -52,70 +53,136 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No access token" }, { status: 400 });
   }
 
-  const graphRes = await fetch(GRAPH_USERS_URL, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+  let usersAdded = 0;
+  let usersUpdated = 0;
+  let usersDeactivated = 0;
 
-  if (!graphRes.ok) {
-    const err = await graphRes.text();
-    console.error("Graph API error:", err);
-    return NextResponse.json({ error: "Graph API failed" }, { status: 502 });
-  }
+  try {
+    const graphRes = await fetch(GRAPH_USERS_URL, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
 
-  const graphData = (await graphRes.json()) as { value?: GraphUser[] };
-  const users = graphData.value ?? [];
-  let synced = 0;
-
-  for (const u of users) {
-    const email = u.mail ?? u.userPrincipalName ?? null;
-    if (!email) continue;
-
-    const { data: existing } = await supabase
-      .from("users")
-      .select("id")
-      .eq("entra_id", u.id)
-      .maybeSingle();
-
-    if (existing) {
-      const { error: updateErr } = await supabase
-        .from("users")
-        .update({
-          full_name: u.displayName ?? undefined,
-          job_title: u.jobTitle ?? undefined,
-          department: u.department ?? undefined,
-          is_active: u.accountEnabled ?? undefined,
-        })
-        .eq("id", existing.id);
-      if (!updateErr) synced++;
-    } else {
-      const { error: insertErr } = await supabase.from("users").insert({
+    if (!graphRes.ok) {
+      const err = await graphRes.text();
+      console.error("Graph API error:", err);
+      const completedAt = new Date().toISOString();
+      await supabase.from("sync_logs").insert({
         organisation_id: organisationId,
-        clerk_user_id: `imported:${u.id}`,
-        email,
-        full_name: u.displayName ?? null,
-        role: "employee",
-        entra_id: u.id,
-        job_title: u.jobTitle ?? null,
-        department: u.department ?? null,
-        is_active: u.accountEnabled ?? true,
-        is_imported: true,
+        integration_id: integration.id,
+        sync_type: "entra_sync",
+        users_added: 0,
+        users_updated: 0,
+        users_deactivated: 0,
+        status: "failed",
+        error_log: `Graph API failed: ${err.slice(0, 1000)}`,
+        started_at: startedAt,
+        completed_at: completedAt,
       });
-      if (!insertErr) synced++;
+      return NextResponse.json({ error: "Graph API failed" }, { status: 502 });
     }
+
+    const graphData = (await graphRes.json()) as { value?: GraphUser[] };
+    const users = graphData.value ?? [];
+    const graphEntraIds = new Set(users.map((u) => u.id));
+
+    for (const u of users) {
+      const email = u.mail ?? u.userPrincipalName ?? null;
+      if (!email) continue;
+
+      const { data: existing } = await supabase
+        .from("users")
+        .select("id")
+        .eq("entra_id", u.id)
+        .maybeSingle();
+
+      if (existing) {
+        const { error: updateErr } = await supabase
+          .from("users")
+          .update({
+            full_name: u.displayName ?? undefined,
+            job_title: u.jobTitle ?? undefined,
+            department: u.department ?? undefined,
+            is_active: u.accountEnabled ?? undefined,
+          })
+          .eq("id", existing.id);
+        if (!updateErr) usersUpdated++;
+      } else {
+        const { error: insertErr } = await supabase.from("users").insert({
+          organisation_id: organisationId,
+          clerk_user_id: `imported:${u.id}`,
+          email,
+          full_name: u.displayName ?? null,
+          role: "employee",
+          entra_id: u.id,
+          job_title: u.jobTitle ?? null,
+          department: u.department ?? null,
+          is_active: u.accountEnabled ?? true,
+          is_imported: true,
+        });
+        if (!insertErr) usersAdded++;
+      }
+    }
+
+    // Deactivate users that exist in our DB (entra_id set) but are no longer in Graph
+    const { data: existingEntraUsers } = await supabase
+      .from("users")
+      .select("id, entra_id")
+      .eq("organisation_id", organisationId)
+      .eq("role", "employee")
+      .not("entra_id", "is", null);
+
+    for (const dbUser of existingEntraUsers ?? []) {
+      const entraId = dbUser.entra_id;
+      if (!entraId || graphEntraIds.has(entraId)) continue;
+      const { error: deactivateErr } = await supabase
+        .from("users")
+        .update({ is_active: false })
+        .eq("id", dbUser.id);
+      if (!deactivateErr) usersDeactivated++;
+    }
+
+    const completedAt = new Date().toISOString();
+    const now = completedAt;
+    await supabase
+      .from("integrations")
+      .update({ last_used_at: now, updated_at: now })
+      .eq("id", integration.id);
+
+    await supabase.from("sync_logs").insert({
+      organisation_id: organisationId,
+      integration_id: integration.id,
+      sync_type: "entra_sync",
+      users_added: usersAdded,
+      users_updated: usersUpdated,
+      users_deactivated: usersDeactivated,
+      status: "success",
+      error_log: null,
+      started_at: startedAt,
+      completed_at: completedAt,
+    });
+
+    return NextResponse.json({
+      success: true,
+      synced: usersAdded + usersUpdated,
+      users_added: usersAdded,
+      users_updated: usersUpdated,
+      users_deactivated: usersDeactivated,
+    });
+  } catch (e) {
+    const completedAt = new Date().toISOString();
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    await supabase.from("sync_logs").insert({
+      organisation_id: organisationId,
+      integration_id: integration.id,
+      sync_type: "entra_sync",
+      users_added: usersAdded,
+      users_updated: usersUpdated,
+      users_deactivated: usersDeactivated,
+      status: "failed",
+      error_log: errorMessage.slice(0, 1000),
+      started_at: startedAt,
+      completed_at: completedAt,
+    });
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
-
-  const now = new Date().toISOString();
-  await supabase
-    .from("integrations")
-    .update({ last_sync_at: now, updated_at: now })
-    .eq("id", integration.id);
-
-  await supabase.from("sync_logs").insert({
-    organisation_id: organisationId,
-    integration_id: integration.id,
-    status: "success",
-    records_synced: synced,
-  });
-
-  return NextResponse.json({ success: true, synced });
 }

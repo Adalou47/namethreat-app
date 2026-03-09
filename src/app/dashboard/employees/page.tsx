@@ -41,9 +41,9 @@ export default async function EmployeesPage() {
   ] = await Promise.all([
     supabase
       .from("integrations")
-      .select("id, last_sync_at")
+      .select("id, last_used_at")
       .eq("organisation_id", organisationId)
-      .eq("provider", "microsoft_entra")
+      .eq("integration_type", "microsoft_entra")
       .eq("status", "active")
       .maybeSingle(),
     supabase
@@ -130,7 +130,7 @@ export default async function EmployeesPage() {
             </h2>
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-xs text-[#6b6b6b]">
-                Last synced: {formatLastSynced(integration.last_sync_at)}
+                Last synced: {formatLastSynced(integration.last_used_at)}
               </span>
               <EntraSyncButton organisationId={organisationId} />
             </div>

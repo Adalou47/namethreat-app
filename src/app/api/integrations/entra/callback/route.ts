@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 
 const TOKEN_URL = "https://login.microsoftonline.com/common/oauth2/v2.0/token";
@@ -57,13 +58,27 @@ export async function GET(request: NextRequest) {
 
   const supabase = createSupabaseServiceClient();
 
+  const now = new Date().toISOString();
+  let connectedByUserId: string | null = null;
+  const { userId: clerkUserId } = await auth();
+  if (clerkUserId) {
+    const { data: dbUser } = await supabase
+      .from("users")
+      .select("id")
+      .eq("clerk_user_id", clerkUserId)
+      .single();
+    connectedByUserId = dbUser?.id ?? null;
+  }
+
   const { data: integration, error: insertError } = await supabase
     .from("integrations")
     .insert({
       organisation_id: state,
-      provider: "microsoft_entra",
+      integration_type: "microsoft_entra",
       status: "active",
       config_json: config,
+      connected_at: now,
+      connected_by_user_id: connectedByUserId,
     })
     .select("id")
     .single();

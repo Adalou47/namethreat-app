@@ -169,10 +169,12 @@ export type ReportsRow = {
 export type IntegrationsRow = {
   id: string;
   organisation_id: string | null;
-  provider: string | null;
+  integration_type: string | null;
   status: string | null;
   config_json: Json | null;
-  last_sync_at: string | null;
+  last_used_at: string | null;
+  connected_at: string | null;
+  connected_by_user_id: string | null;
   created_at: string | null;
   updated_at: string | null;
 };
@@ -181,8 +183,14 @@ export type SyncLogsRow = {
   id: string;
   organisation_id: string | null;
   integration_id: string | null;
+  sync_type: string | null;
+  users_added: number | null;
+  users_updated: number | null;
+  users_deactivated: number | null;
   status: string | null;
-  records_synced: number | null;
+  error_log: string | null;
+  started_at: string | null;
+  completed_at: string | null;
   created_at: string | null;
 };
 
@@ -386,10 +394,12 @@ export type Database = {
         Insert: {
           id?: string;
           organisation_id?: string | null;
-          provider?: string | null;
+          integration_type?: string | null;
           status?: string | null;
           config_json?: Json | null;
-          last_sync_at?: string | null;
+          last_used_at?: string | null;
+          connected_at?: string | null;
+          connected_by_user_id?: string | null;
           created_at?: string | null;
           updated_at?: string | null;
         };
@@ -402,8 +412,14 @@ export type Database = {
           id?: string;
           organisation_id?: string | null;
           integration_id?: string | null;
+          sync_type?: string | null;
+          users_added?: number | null;
+          users_updated?: number | null;
+          users_deactivated?: number | null;
           status?: string | null;
-          records_synced?: number | null;
+          error_log?: string | null;
+          started_at?: string | null;
+          completed_at?: string | null;
           created_at?: string | null;
         };
         Update: Partial<SyncLogsRow>;
