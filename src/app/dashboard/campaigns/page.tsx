@@ -27,7 +27,7 @@ export default async function CampaignsPage() {
   const isMspAdmin = dbUser.role === "msp_admin" && dbUser.msp_id;
   let orgIds: string[] = [dbUser.organisation_id];
 
-  if (isMspAdmin) {
+  if (dbUser.msp_id) {
     const { data: clientOrgs } = await supabase
       .from("organisations")
       .select("id")
