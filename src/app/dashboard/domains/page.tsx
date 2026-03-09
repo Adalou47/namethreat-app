@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
+import { Shield } from "lucide-react";
 
 export default async function DomainsPage() {
   const { userId } = await auth();
@@ -15,9 +16,29 @@ export default async function DomainsPage() {
   if (!dbUser?.organisation_id) redirect("/onboarding/msp");
 
   return (
-    <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-6">
-      <h1 className="text-xl font-semibold text-[#000000]">Domain Intelligence</h1>
-      <p className="mt-2 text-sm text-[#6b6b6b]">This page is under construction.</p>
+    <div className="space-y-6">
+      <header>
+        <h1 className="text-xl font-semibold text-[#000000]">Domain Intelligence</h1>
+        <p className="mt-1 text-sm text-[#6b6b6b]">
+          Monitor your domain for threats and lookalikes
+        </p>
+      </header>
+
+      <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-12">
+        <div className="flex flex-col items-center justify-center text-center">
+          <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-[#e5e5e5] bg-white text-[#6b6b6b]">
+            <Shield className="h-7 w-7" />
+          </span>
+          <p className="text-sm font-medium text-[#000000]">No domains monitored yet</p>
+          <button
+            type="button"
+            disabled
+            className="mt-4 cursor-not-allowed rounded-[4px] border border-[#e5e5e5] bg-[#e5e5e5] px-4 py-2.5 text-sm font-medium text-[#6b6b6b]"
+          >
+            Add Domain
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

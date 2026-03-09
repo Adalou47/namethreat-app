@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
-import Link from "next/link";
+import { Users } from "lucide-react";
 
 export default async function EmployeesPage() {
   const { userId } = await auth();
@@ -16,13 +16,28 @@ export default async function EmployeesPage() {
   if (!dbUser?.organisation_id) redirect("/onboarding/msp");
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] px-4 py-6">
-      <div className="mx-auto max-w-4xl">
-        <Link href="/dashboard" className="text-sm text-[#6b6b6b] hover:text-[#000000]">
-          ← Back to dashboard
-        </Link>
-        <h1 className="mt-4 text-2xl font-semibold text-[#000000]">Import Employees</h1>
-        <p className="mt-2 text-sm text-[#6b6b6b]">This page is under construction.</p>
+    <div className="space-y-6">
+      <header>
+        <h1 className="text-xl font-semibold text-[#000000]">Employees</h1>
+        <p className="mt-1 text-sm text-[#6b6b6b]">
+          Manage your team and view individual risk scores
+        </p>
+      </header>
+
+      <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-12">
+        <div className="flex flex-col items-center justify-center text-center">
+          <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-[#e5e5e5] bg-white text-[#6b6b6b]">
+            <Users className="h-7 w-7" />
+          </span>
+          <p className="text-sm font-medium text-[#000000]">No employees yet</p>
+          <button
+            type="button"
+            disabled
+            className="mt-4 cursor-not-allowed rounded-[4px] border border-[#e5e5e5] bg-[#e5e5e5] px-4 py-2.5 text-sm font-medium text-[#6b6b6b]"
+          >
+            Import Employees
+          </button>
+        </div>
       </div>
     </div>
   );
