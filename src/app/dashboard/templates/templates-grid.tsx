@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Eye } from "lucide-react";
+import { getCategoryDisplayName } from "@/lib/category-display";
 
 type Template = {
   id: string;
@@ -22,7 +23,7 @@ export function TemplatesGrid({ templates }: { templates: Template[] }) {
           <div className="mt-2 flex flex-wrap gap-2">
             {t.category && (
               <span className="rounded-[4px] bg-white px-2 py-0.5 text-xs text-[#6b6b6b]">
-                {t.category}
+                {getCategoryDisplayName(t.category) || t.category}
               </span>
             )}
             {t.difficulty && (

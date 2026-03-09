@@ -22,7 +22,11 @@ export default async function TemplatesPage({
     .maybeSingle();
   if (!dbUser?.organisation_id) redirect("/onboarding/msp");
 
-  const params = await searchParams;
+  const raw = await searchParams;
+  const category = typeof raw.category === "string" ? raw.category : Array.isArray(raw.category) ? raw.category[0] : undefined;
+  const difficulty = typeof raw.difficulty === "string" ? raw.difficulty : Array.isArray(raw.difficulty) ? raw.difficulty[0] : undefined;
+  const country = typeof raw.country === "string" ? raw.country : Array.isArray(raw.country) ? raw.country[0] : undefined;
+
   let templates: { id: string; name: string | null; category: string | null; difficulty: string | null; target_country: string | null; language: string | null }[] = [];
   let categoryList: string[] = [];
   try {
@@ -30,9 +34,9 @@ export default async function TemplatesPage({
       .from("phishing_templates")
       .select("id, name, category, difficulty, target_country, language")
       .eq("is_published", true);
-    if (params.category) query = query.eq("category", params.category);
-    if (params.difficulty) query = query.eq("difficulty", params.difficulty);
-    if (params.country) query = query.eq("target_country", params.country);
+    if (category) query = query.eq("category", category);
+    if (difficulty) query = query.eq("difficulty", difficulty);
+    if (country) query = query.eq("target_country", country);
     const res = await query.order("name");
     templates = res.data ?? [];
     const catRes = await supabase.from("phishing_templates").select("category").eq("is_published", true);
@@ -53,9 +57,9 @@ export default async function TemplatesPage({
 
       <TemplatesFilterBar
         categoryList={categoryList}
-        currentCategory={params.category}
-        currentDifficulty={params.difficulty}
-        currentCountry={params.country}
+        currentCategory={category}
+        currentDifficulty={difficulty}
+        currentCountry={country}
       />
 
       {!templates?.length ? (

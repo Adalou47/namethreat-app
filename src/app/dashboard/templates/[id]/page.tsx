@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
+import { getCategoryDisplayName } from "@/lib/category-display";
 
 export default async function TemplatePreviewPage({
   params,
@@ -37,7 +38,7 @@ export default async function TemplatePreviewPage({
           <div className="mt-2 flex flex-wrap gap-2">
             {template.category && (
               <span className="rounded-[4px] bg-[#f5f5f5] px-2 py-1 text-xs text-[#6b6b6b]">
-                {template.category}
+                {getCategoryDisplayName(template.category) || template.category}
               </span>
             )}
             {template.difficulty && (

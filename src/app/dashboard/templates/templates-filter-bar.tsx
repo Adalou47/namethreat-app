@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCategoryDisplayName } from "@/lib/category-display";
 
 const DIFFICULTIES = ["Easy", "Medium", "Hard"];
 const COUNTRIES = ["US", "UK", "DE", "FR", "AU"];
@@ -42,7 +43,7 @@ export function TemplatesFilterBar({
           href={buildUrl({ category: c, difficulty: currentDifficulty, country: currentCountry })}
           className={`rounded-[4px] px-3 py-1.5 text-sm ${currentCategory === c ? "bg-[#000000] text-white" : "bg-white text-[#000000] hover:bg-[#e5e5e5]"}`}
         >
-          {c}
+          {getCategoryDisplayName(c) || c}
         </Link>
       ))}
       <span className="ml-2 border-l border-[#e5e5e5] pl-3 text-xs font-medium uppercase tracking-wider text-[#6b6b6b]">
