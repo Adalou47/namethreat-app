@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     .select("id, config_json")
     .eq("organisation_id", organisationId)
     .eq("integration_type", "microsoft_entra")
-    .eq("status", "active")
+    .eq("status", "connected")
     .single();
 
   if (intError || !integration) {

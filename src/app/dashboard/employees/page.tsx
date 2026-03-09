@@ -44,7 +44,7 @@ export default async function EmployeesPage() {
       .select("id, last_used_at")
       .eq("organisation_id", organisationId)
       .eq("integration_type", "microsoft_entra")
-      .eq("status", "active")
+      .eq("status", "connected")
       .maybeSingle(),
     supabase
       .from("users")

@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
     .insert({
       organisation_id: state,
       integration_type: "microsoft_entra",
-      status: "active",
+      status: "connected",
       config_json: config,
       connected_at: now,
       connected_by_user_id: connectedByUserId,
