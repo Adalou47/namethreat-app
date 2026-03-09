@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 
 const GRAPH_USERS_BASE =
-  "https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName,jobTitle,department,accountEnabled&$top=100";
+  "https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName,jobTitle,department,accountEnabled";
 
 type GraphUser = {
   id: string;
@@ -63,9 +63,15 @@ export async function POST(request: NextRequest) {
     const allUsers: GraphUser[] = [];
 
     while (url) {
+      console.log("Calling Graph API with token:", accessToken.substring(0, 20) + "...");
+      console.log("URL:", url);
       const response = await fetch(url, { headers });
+      console.log("Graph response status:", response.status);
+      console.log("Graph response headers:", Object.fromEntries(response.headers.entries()));
+      const data = (await response.json()) as { value?: GraphUser[]; "@odata.nextLink"?: string };
+      console.log("Graph response:", JSON.stringify(data).substring(0, 500));
       if (!response.ok) {
-        const err = await response.text();
+        const err = JSON.stringify(data);
         console.error("Graph API error:", err);
         const completedAt = new Date().toISOString();
         await supabase.from("sync_logs").insert({
@@ -82,7 +88,6 @@ export async function POST(request: NextRequest) {
         });
         return NextResponse.json({ error: "Graph API failed" }, { status: 502 });
       }
-      const data = (await response.json()) as { value?: GraphUser[]; "@odata.nextLink"?: string };
       allUsers.push(...(data.value ?? []));
       url = data["@odata.nextLink"] ?? null;
     }
