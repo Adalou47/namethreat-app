@@ -1,69 +1,62 @@
 import Link from "next/link";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import { Users, Mail, Shield, CheckCircle } from "lucide-react";
 
 export default async function DashboardPage() {
-  const { userId } = await auth();
+  const { userId: clerkUserId } = await auth();
 
-  if (!userId) {
+  if (!clerkUserId) {
     redirect("/sign-in");
   }
 
   const supabase = createSupabaseServiceClient();
-  let { data: dbUser } = await supabase
-    .from("users")
-    .select("id, organisation_id, email, full_name, role")
-    .eq("clerk_user_id", userId)
-    .maybeSingle();
 
-  if (!dbUser || !dbUser.organisation_id) {
-    const clerkUser = await currentUser();
-    const metadata = clerkUser?.publicMetadata as
-      | { onboarding_complete?: boolean; signup_type?: string }
-      | undefined;
-    if (metadata?.onboarding_complete === true) {
-      await new Promise((r) => setTimeout(r, 300));
-      const refetch = await supabase
-        .from("users")
-        .select("id, organisation_id, email, full_name, role")
-        .eq("clerk_user_id", userId)
-        .maybeSingle();
-      dbUser = refetch.data;
-    }
-    if (!dbUser || !dbUser.organisation_id) {
-      const signupType = metadata?.signup_type;
-      if (signupType === "company") {
-        redirect("/onboarding/company");
-      }
-      redirect("/onboarding/msp");
-    }
+  const { data: user, error: userError } = await supabase
+    .from("users")
+    .select("*, organisations(*)")
+    .eq("clerk_user_id", clerkUserId)
+    .single();
+
+  if (userError || !user) {
+    redirect("/onboarding/company");
   }
 
-  const orgId = dbUser.organisation_id;
+  const organisationId = user.organisation_id;
+  if (!organisationId) {
+    redirect("/onboarding/company");
+  }
 
   const [
     { count: employeeCount },
-    { count: activeCampaignsCount },
+    { count: campaignCount },
   ] = await Promise.all([
     supabase
       .from("users")
-      .select("id", { count: "exact", head: true })
-      .eq("organisation_id", orgId)
+      .select("*", { count: "exact", head: true })
+      .eq("organisation_id", organisationId)
       .eq("role", "employee"),
     supabase
       .from("phishing_campaigns")
-      .select("id", { count: "exact", head: true })
-      .eq("organisation_id", orgId)
+      .select("*", { count: "exact", head: true })
+      .eq("organisation_id", organisationId)
       .eq("status", "active"),
   ]);
 
   const totalEmployees = employeeCount ?? 0;
-  const activeCampaigns = activeCampaignsCount ?? 0;
+  const activeCampaigns = campaignCount ?? 0;
+  const userRole = user.role ?? "—";
+  const roleLabel = String(userRole).replace(/_/g, " ");
 
   return (
     <div className="space-y-6">
+      <header className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        <p className="text-sm text-[#6b6b6b]">
+          Signed in as <span className="font-medium capitalize text-[#000000]">{roleLabel}</span>
+        </p>
+      </header>
+
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-4">
           <div className="mb-2 flex items-center gap-2">
