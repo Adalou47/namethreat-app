@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import { Users, Shield, FileSpreadsheet } from "lucide-react";
 import { EntraSyncButton } from "@/components/entra-sync-button";
+import { CsvImportSection } from "@/components/csv-import-section";
 
 function formatLastSynced(at: string | null): string {
   if (!at) return "Never";
@@ -109,16 +110,6 @@ export default async function EmployeesPage() {
               </div>
             </div>
           </section>
-          <section>
-            <p className="mb-3 text-sm text-[#6b6b6b]">Or import manually</p>
-            <button
-              type="button"
-              disabled
-              className="cursor-not-allowed rounded-[4px] border border-[#e5e5e5] bg-[#e5e5e5] px-4 py-2.5 text-sm font-medium text-[#6b6b6b]"
-            >
-              CSV upload (coming soon)
-            </button>
-          </section>
         </>
       )}
 
@@ -184,6 +175,10 @@ export default async function EmployeesPage() {
           )}
         </section>
       )}
+
+      <section>
+        <CsvImportSection organisationId={organisationId} />
+      </section>
     </div>
   );
 }
