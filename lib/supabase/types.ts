@@ -107,6 +107,63 @@ export type PhishingCampaignsRow = {
   updated_at: string | null;
 };
 
+export type PhishingTemplatesRow = {
+  id: string;
+  name: string | null;
+  category: string | null;
+  target_country: string | null;
+  target_industry: string | null;
+  language: string | null;
+  subject: string | null;
+  sender_name: string | null;
+  preview_text: string | null;
+  body_html: string | null;
+  landing_page_html: string | null;
+  difficulty: string | null;
+  is_global: boolean | null;
+  is_published: boolean | null;
+  tags: Json | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
+export type SendingDomainsRow = {
+  id: string;
+  domain: string | null;
+  registrar: string | null;
+  registered_at: string | null;
+  expires_at: string | null;
+  status: string | null;
+  warming_started_at: string | null;
+  activated_at: string | null;
+  aws_identity_arn: string | null;
+  spf_configured: boolean | null;
+  dmarc_configured: boolean | null;
+  daily_send_limit: number | null;
+  emails_sent_today: number | null;
+  emails_sent_total: number | null;
+  last_used_at: string | null;
+  last_checked_at: string | null;
+  reputation_score: number | null;
+  notes: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
+export type CampaignDeliveriesRow = {
+  id: string;
+  campaign_id: string | null;
+  user_id: string | null;
+  sent_at: string | null;
+  opened_at: string | null;
+  clicked_at: string | null;
+  credentials_submitted: boolean | null;
+  reported_at: string | null;
+  outcome: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
 export type CoursesRow = {
   id: string;
   name: string | null;
@@ -285,33 +342,26 @@ export type Database = {
       };
       phishing_campaigns: {
         Row: PhishingCampaignsRow;
-        Insert: {
-          id?: string;
-          organisation_id?: string | null;
-          msp_id?: string | null;
-          name?: string | null;
-          status?: string | null;
-          template_id?: string | null;
-          sending_domain_id?: string | null;
-          target_country?: string | null;
-          target_department?: string | null;
-          target_difficulty?: string | null;
-          scheduled_at?: string | null;
-          started_at?: string | null;
-          completed_at?: string | null;
-          total_targets?: number | null;
-          total_sent?: number | null;
-          total_opened?: number | null;
-          total_clicked?: number | null;
-          total_reported?: number | null;
-          open_rate?: number | null;
-          click_rate?: number | null;
-          report_rate?: number | null;
-          created_by_user_id?: string | null;
-          created_at?: string | null;
-          updated_at?: string | null;
-        };
+        Insert: { [K in keyof PhishingCampaignsRow]?: PhishingCampaignsRow[K] };
         Update: Partial<PhishingCampaignsRow>;
+        Relationships: [];
+      };
+      phishing_templates: {
+        Row: PhishingTemplatesRow;
+        Insert: { [K in keyof PhishingTemplatesRow]?: PhishingTemplatesRow[K] };
+        Update: Partial<PhishingTemplatesRow>;
+        Relationships: [];
+      };
+      sending_domains: {
+        Row: SendingDomainsRow;
+        Insert: { [K in keyof SendingDomainsRow]?: SendingDomainsRow[K] };
+        Update: Partial<SendingDomainsRow>;
+        Relationships: [];
+      };
+      campaign_deliveries: {
+        Row: CampaignDeliveriesRow;
+        Insert: { [K in keyof CampaignDeliveriesRow]?: CampaignDeliveriesRow[K] };
+        Update: Partial<CampaignDeliveriesRow>;
         Relationships: [];
       };
       courses: {

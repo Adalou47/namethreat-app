@@ -1,0 +1,73 @@
+import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
+import { createSupabaseServiceClient } from "@/lib/supabase/server";
+import { CampaignWizard } from "./campaign-wizard";
+
+export default async function NewCampaignPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ template_id?: string }>;
+}) {
+  const { userId } = await auth();
+  if (!userId) redirect("/sign-in");
+
+  const supabase = createSupabaseServiceClient();
+  const { data: dbUser } = await supabase
+    .from("users")
+    .select("organisation_id")
+    .eq("clerk_user_id", userId)
+    .maybeSingle();
+  if (!dbUser?.organisation_id) redirect("/onboarding/msp");
+
+  const params = await searchParams;
+  const preselectedTemplateId = params.template_id ?? null;
+
+  let templates: { id: string; name: string | null; category: string | null; difficulty: string | null; target_country: string | null; language: string | null }[] = [];
+  let sendingDomains: { id: string; domain: string | null; reputation_score: number | null }[] = [];
+  let departments: string[] = [];
+  try {
+    const [tRes, sRes, dRes] = await Promise.all([
+      supabase
+        .from("phishing_templates")
+        .select("id, name, category, difficulty, target_country, language")
+        .eq("is_published", true)
+        .order("name"),
+      supabase
+        .from("sending_domains")
+        .select("id, domain, reputation_score")
+        .eq("status", "active"),
+      supabase
+        .from("users")
+        .select("department")
+        .eq("organisation_id", dbUser.organisation_id)
+        .eq("role", "employee")
+        .not("department", "is", null),
+    ]);
+    templates = tRes.data ?? [];
+    sendingDomains = sRes.data ?? [];
+    departments = [...new Set((dRes.data ?? []).map((d) => d.department).filter(Boolean))] as string[];
+  } catch {
+    templates = [];
+    sendingDomains = [];
+    departments = [];
+  }
+
+  return (
+    <div className="space-y-6">
+      <header>
+        <h1 className="text-xl font-semibold text-[#000000]">Create Campaign</h1>
+        <p className="mt-1 text-sm text-[#6b6b6b]">
+          Set up a new phishing simulation in three steps
+        </p>
+      </header>
+      <CampaignWizard
+        organisationId={dbUser.organisation_id}
+        userId={userId}
+        templates={templates ?? []}
+        sendingDomains={sendingDomains ?? []}
+        departments={departments}
+        preselectedTemplateId={preselectedTemplateId}
+      />
+    </div>
+  );
+}

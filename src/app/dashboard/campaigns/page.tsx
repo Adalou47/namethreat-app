@@ -1,7 +1,16 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
-import { Mail } from "lucide-react";
+import { Mail, Plus } from "lucide-react";
+
+const STATUS_STYLES: Record<string, string> = {
+  draft: "bg-[#e5e5e5] text-[#6b6b6b]",
+  scheduled: "bg-blue-100 text-blue-800",
+  active: "bg-green-100 text-green-800",
+  completed: "bg-[#000000] text-white",
+  cancelled: "bg-red-100 text-red-800",
+};
 
 export default async function CampaignsPage() {
   const { userId } = await auth();
@@ -15,30 +24,105 @@ export default async function CampaignsPage() {
     .maybeSingle();
   if (!dbUser?.organisation_id) redirect("/onboarding/msp");
 
+  const { data: campaigns } = await supabase
+    .from("phishing_campaigns")
+    .select("id, name, status, total_targets, total_sent, total_clicked, click_rate, created_at")
+    .eq("organisation_id", dbUser.organisation_id)
+    .order("created_at", { ascending: false });
+
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-xl font-semibold text-[#000000]">Phishing Campaigns</h1>
-        <p className="mt-1 text-sm text-[#6b6b6b]">
-          Create and manage phishing simulations
-        </p>
+      <header className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold text-[#000000]">Phishing Campaigns</h1>
+          <p className="mt-1 text-sm text-[#6b6b6b]">
+            Create and manage phishing simulations
+          </p>
+        </div>
+        <Link
+          href="/dashboard/campaigns/new"
+          className="inline-flex items-center gap-2 rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+        >
+          <Plus className="h-4 w-4" />
+          Create Campaign
+        </Link>
       </header>
 
-      <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-12">
-        <div className="flex flex-col items-center justify-center text-center">
-          <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-[#e5e5e5] bg-white text-[#6b6b6b]">
-            <Mail className="h-7 w-7" />
-          </span>
-          <p className="text-sm font-medium text-[#000000]">No campaigns yet</p>
-          <button
-            type="button"
-            disabled
-            className="mt-4 cursor-not-allowed rounded-[4px] border border-[#e5e5e5] bg-[#e5e5e5] px-4 py-2.5 text-sm font-medium text-[#6b6b6b]"
+      {!campaigns?.length ? (
+        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-12 text-center">
+          <Mail className="mx-auto mb-3 h-12 w-12 text-[#6b6b6b]" />
+          <p className="text-sm font-medium text-[#000000]">No campaigns yet.</p>
+          <p className="mt-1 text-sm text-[#6b6b6b]">
+            Create your first phishing simulation.
+          </p>
+          <Link
+            href="/dashboard/campaigns/new"
+            className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
           >
             Create Campaign
-          </button>
+          </Link>
         </div>
-      </div>
+      ) : (
+        <div className="overflow-x-auto rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5]">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-[#e5e5e5]">
+                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Name</th>
+                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Status</th>
+                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Targets</th>
+                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Sent</th>
+                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Clicked</th>
+                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Click Rate</th>
+                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Created</th>
+                <th className="pb-3 font-medium text-[#6b6b6b]">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {campaigns.map((c) => (
+                <tr
+                  key={c.id}
+                  className="border-b border-[#e5e5e5] last:border-0 hover:bg-white/50"
+                >
+                  <td className="py-3 pr-4">
+                    <Link
+                      href={`/dashboard/campaigns/${c.id}`}
+                      className="font-medium text-[#000000] hover:underline"
+                    >
+                      {c.name ?? "Unnamed"}
+                    </Link>
+                  </td>
+                  <td className="py-3 pr-4">
+                    <span
+                      className={`rounded-[4px] px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[c.status ?? ""] ?? "bg-[#e5e5e5] text-[#6b6b6b]"}`}
+                    >
+                      {c.status ?? "—"}
+                    </span>
+                  </td>
+                  <td className="py-3 pr-4 text-[#000000]">{c.total_targets ?? 0}</td>
+                  <td className="py-3 pr-4 text-[#000000]">{c.total_sent ?? 0}</td>
+                  <td className="py-3 pr-4 text-[#000000]">{c.total_clicked ?? 0}</td>
+                  <td className="py-3 pr-4 text-[#000000]">
+                    {c.click_rate != null ? `${c.click_rate}%` : "—"}
+                  </td>
+                  <td className="py-3 pr-4 text-[#6b6b6b]">
+                    {c.created_at
+                      ? new Date(c.created_at).toLocaleDateString()
+                      : "—"}
+                  </td>
+                  <td className="py-3">
+                    <Link
+                      href={`/dashboard/campaigns/${c.id}`}
+                      className="text-sm font-medium text-[#000000] hover:underline"
+                    >
+                      View
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
