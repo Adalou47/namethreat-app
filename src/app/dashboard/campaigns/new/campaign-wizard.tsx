@@ -54,10 +54,10 @@ export function CampaignWizard({
   }, [preselectedTemplateId]);
 
   useEffect(() => {
-    if (selectedTemplate?.name && !campaignName) {
-      setCampaignName(`${selectedTemplate.name} - ${new Date().toLocaleDateString()}`);
+    if (selectedTemplate) {
+      setCampaignName(selectedTemplate.name ?? "");
     }
-  }, [selectedTemplate?.name, campaignName]);
+  }, [selectedTemplate]);
 
   const canNextStep1 = !!templateId;
   const canNextStep2 =
