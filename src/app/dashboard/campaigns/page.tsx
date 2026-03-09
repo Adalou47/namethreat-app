@@ -22,6 +22,7 @@ export default async function CampaignsPage() {
     .select("organisation_id, role, msp_id")
     .eq("clerk_user_id", userId)
     .maybeSingle();
+  if (!dbUser) redirect("/onboarding/msp");
   const hasOrg = dbUser.organisation_id != null;
   const hasMsp = dbUser.msp_id != null;
   if (!hasOrg && !hasMsp) redirect("/onboarding/msp");
