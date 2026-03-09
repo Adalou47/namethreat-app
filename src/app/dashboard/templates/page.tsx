@@ -24,7 +24,8 @@ export default async function TemplatesPage({
 
   const raw = await searchParams;
   const category = typeof raw.category === "string" ? raw.category : Array.isArray(raw.category) ? raw.category[0] : undefined;
-  const difficulty = typeof raw.difficulty === "string" ? raw.difficulty : Array.isArray(raw.difficulty) ? raw.difficulty[0] : undefined;
+  const difficultyRaw = typeof raw.difficulty === "string" ? raw.difficulty : Array.isArray(raw.difficulty) ? raw.difficulty[0] : undefined;
+  const difficulty = difficultyRaw?.toLowerCase() || undefined;
   const country = typeof raw.country === "string" ? raw.country : Array.isArray(raw.country) ? raw.country[0] : undefined;
 
   let templates: { id: string; name: string | null; category: string | null; difficulty: string | null; target_country: string | null; language: string | null }[] = [];
