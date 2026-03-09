@@ -47,7 +47,7 @@ export default async function CampaignsPage() {
     const { data: orgs } = await supabase
       .from("organisations")
       .select("id, name")
-      .in("id", ids);
+      .in("id", ids.filter((id): id is string => id !== null));
     orgNames = (orgs ?? []).reduce<Record<string, string>>((acc, o) => {
       acc[o.id] = o.name ?? "—";
       return acc;
