@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { BarChart3 } from "lucide-react";
 
 type Campaign = { id: string; name: string | null };
 type Row = {
