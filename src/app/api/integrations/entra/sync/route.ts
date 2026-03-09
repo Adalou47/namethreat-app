@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 
-const GRAPH_USERS_URL =
-  "https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName,jobTitle,department,accountEnabled&$top=999";
+const GRAPH_USERS_BASE =
+  "https://graph.microsoft.com/v1.0/users?$select=id,displayName,mail,userPrincipalName,jobTitle,department,accountEnabled&$top=100";
 
 type GraphUser = {
   id: string;
@@ -58,31 +58,36 @@ export async function POST(request: NextRequest) {
   let usersDeactivated = 0;
 
   try {
-    const graphRes = await fetch(GRAPH_USERS_URL, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    const headers = { Authorization: `Bearer ${accessToken}` };
+    let url: string | null = GRAPH_USERS_BASE;
+    const allUsers: GraphUser[] = [];
 
-    if (!graphRes.ok) {
-      const err = await graphRes.text();
-      console.error("Graph API error:", err);
-      const completedAt = new Date().toISOString();
-      await supabase.from("sync_logs").insert({
-        organisation_id: organisationId,
-        integration_id: integration.id,
-        sync_type: "entra_sync",
-        users_added: 0,
-        users_updated: 0,
-        users_deactivated: 0,
-        status: "failed",
-        error_log: `Graph API failed: ${err.slice(0, 1000)}`,
-        started_at: startedAt,
-        completed_at: completedAt,
-      });
-      return NextResponse.json({ error: "Graph API failed" }, { status: 502 });
+    while (url) {
+      const response = await fetch(url, { headers });
+      if (!response.ok) {
+        const err = await response.text();
+        console.error("Graph API error:", err);
+        const completedAt = new Date().toISOString();
+        await supabase.from("sync_logs").insert({
+          organisation_id: organisationId,
+          integration_id: integration.id,
+          sync_type: "entra_sync",
+          users_added: 0,
+          users_updated: 0,
+          users_deactivated: 0,
+          status: "failed",
+          error_log: `Graph API failed: ${err.slice(0, 1000)}`,
+          started_at: startedAt,
+          completed_at: completedAt,
+        });
+        return NextResponse.json({ error: "Graph API failed" }, { status: 502 });
+      }
+      const data = (await response.json()) as { value?: GraphUser[]; "@odata.nextLink"?: string };
+      allUsers.push(...(data.value ?? []));
+      url = data["@odata.nextLink"] ?? null;
     }
 
-    const graphData = (await graphRes.json()) as { value?: GraphUser[] };
-    const users = graphData.value ?? [];
+    const users = allUsers;
     const graphEntraIds = new Set(users.map((u) => u.id));
 
     for (const u of users) {
