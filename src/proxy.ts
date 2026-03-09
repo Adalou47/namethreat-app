@@ -1,4 +1,4 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 const isPublic = createRouteMatcher([
@@ -23,6 +23,21 @@ export default clerkMiddleware(async (auth, req) => {
 
   if (path.startsWith("/dashboard") && !userId) {
     return NextResponse.redirect(new URL("/", req.url));
+  }
+
+  // Signed-in user hitting /dashboard: only use Clerk onboarding_complete, not organisation_id
+  if (path.startsWith("/dashboard") && userId) {
+    const user = await currentUser();
+    const metadata = user?.publicMetadata as
+      | { onboarding_complete?: boolean; signup_type?: string }
+      | undefined;
+    if (metadata?.onboarding_complete !== true) {
+      const signupType = metadata?.signup_type;
+      if (signupType === "company") {
+        return NextResponse.redirect(new URL("/onboarding/company", req.url));
+      }
+      return NextResponse.redirect(new URL("/onboarding/msp", req.url));
+    }
   }
 
   return NextResponse.next();
