@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+// Service role client to bypass RLS for server-side dashboard data
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import {
   Users,
@@ -9,12 +10,11 @@ import {
   CheckCircle,
   Building2,
 } from "lucide-react";
-type ClientOrgWithStats = {
-  org: { id: string; name: string | null; onboarding_complete: boolean | null };
+
+type ClientOrgItem = {
+  id: string;
+  name: string | null;
   employeeCount: number;
-  activeCampaigns: number;
-  avgRiskScore: number | null;
-  status: string;
 };
 
 export default async function DashboardPage() {
@@ -26,22 +26,21 @@ export default async function DashboardPage() {
 
   const supabase = createSupabaseServiceClient();
 
-  const { data: user, error: userError } = await supabase
+  const { data: user } = await supabase
     .from("users")
     .select("*, organisations(*)")
     .eq("clerk_user_id", clerkUserId)
     .single();
 
-  if (userError || !user) {
+  if (!user) {
     redirect("/onboarding/company");
   }
 
   const userRole = user.role ?? "";
   const roleLabel = String(userRole).replace(/_/g, " ");
   const isMspAdmin = userRole === "msp_admin";
-  const isOrgUser = userRole === "org_admin" || userRole === "org_viewer";
 
-  // —— MSP admin: aggregated data across all client organisations ——
+  // —— msp_admin: all organisations where msp_id = user.msp_id, aggregated counts ——
   if (isMspAdmin) {
     const mspId = user.msp_id;
     if (!mspId) {
@@ -58,7 +57,7 @@ export default async function DashboardPage() {
 
     const { data: clientOrgs } = await supabase
       .from("organisations")
-      .select("id, name, onboarding_complete")
+      .select("id, name")
       .eq("msp_id", mspId);
 
     const orgIds = (clientOrgs ?? []).map((o) => o.id);
@@ -76,80 +75,49 @@ export default async function DashboardPage() {
 
     const [
       { data: allEmployees },
-      { data: activeCampaigns },
+      { count: totalActiveCampaigns },
     ] = await Promise.all([
       supabase
         .from("users")
-        .select("organisation_id, risk_score")
+        .select("organisation_id")
         .in("organisation_id", orgIds)
         .eq("role", "employee"),
       supabase
         .from("phishing_campaigns")
-        .select("organisation_id")
+        .select("*", { count: "exact", head: true })
         .in("organisation_id", orgIds)
         .eq("status", "active"),
     ]);
 
     const totalEmployees = (allEmployees ?? []).length;
-    const totalActiveCampaigns = (activeCampaigns ?? []).length;
     const totalClients = orgIds.length;
-
-    // Per-org stats for client list
-    const employeesByOrg = (allEmployees ?? []).reduce(
+    const employeesByOrg = (allEmployees ?? []).reduce<Record<string, number>>(
       (acc, u) => {
         const id = u.organisation_id ?? "";
-        if (!acc[id]) acc[id] = { count: 0, riskSum: 0, riskCount: 0 };
-        acc[id].count += 1;
-        if (u.risk_score != null) {
-          acc[id].riskSum += u.risk_score;
-          acc[id].riskCount += 1;
-        }
-        return acc;
-      },
-      {} as Record<string, { count: number; riskSum: number; riskCount: number }>
-    );
-    const campaignsByOrg = (activeCampaigns ?? []).reduce(
-      (acc, c) => {
-        const id = c.organisation_id ?? "";
         acc[id] = (acc[id] ?? 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {}
     );
-
-    const clientOrgsWithStats: ClientOrgWithStats[] = (clientOrgs ?? []).map(
-      (org) => {
-        const emp = employeesByOrg[org.id] ?? { count: 0, riskSum: 0, riskCount: 0 };
-        const avgRisk =
-          emp.riskCount > 0
-            ? Math.round(emp.riskSum / emp.riskCount)
-            : null;
-        return {
-          org: { id: org.id, name: org.name, onboarding_complete: org.onboarding_complete },
-          employeeCount: emp.count,
-          activeCampaigns: campaignsByOrg[org.id] ?? 0,
-          avgRiskScore: avgRisk,
-          status: org.onboarding_complete ? "Active" : "Setup",
-        };
-      }
-    );
+    const clientOrgsList: ClientOrgItem[] = (clientOrgs ?? []).map((org) => ({
+      id: org.id,
+      name: org.name,
+      employeeCount: employeesByOrg[org.id] ?? 0,
+    }));
 
     return (
       <DashboardMspView
         totalClients={totalClients}
         totalEmployees={totalEmployees}
-        totalActiveCampaigns={totalActiveCampaigns}
-        clientOrgs={clientOrgsWithStats}
+        totalActiveCampaigns={totalActiveCampaigns ?? 0}
+        clientOrgs={clientOrgsList}
         roleLabel={roleLabel}
       />
     );
   }
 
-  // —— Org admin / org viewer: single organisation only ——
+  // —— org_admin: own organisation only ——
   const organisationId = user.organisation_id;
-  if (!organisationId && isOrgUser) {
-    redirect("/onboarding/company");
-  }
   if (!organisationId) {
     redirect("/onboarding/company");
   }
@@ -182,7 +150,7 @@ export default async function DashboardPage() {
   );
 }
 
-// MSP dashboard: aggregated stats + client organisations list
+// MSP dashboard: aggregated stats + client organisations list (name + employee count)
 function DashboardMspView({
   totalClients,
   totalEmployees,
@@ -193,7 +161,7 @@ function DashboardMspView({
   totalClients: number;
   totalEmployees: number;
   totalActiveCampaigns: number;
-  clientOrgs: ClientOrgWithStats[];
+  clientOrgs: ClientOrgItem[];
   roleLabel: string;
 }) {
   return (
@@ -271,24 +239,16 @@ function DashboardMspView({
               <thead>
                 <tr className="border-b border-[#e5e5e5]">
                   <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Organisation</th>
-                  <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Employees</th>
-                  <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Active campaigns</th>
-                  <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Avg risk</th>
-                  <th className="pb-3 font-medium text-[#6b6b6b]">Status</th>
+                  <th className="pb-3 font-medium text-[#6b6b6b]">Employees</th>
                 </tr>
               </thead>
               <tbody>
-                {clientOrgs.map(({ org, employeeCount, activeCampaigns, avgRiskScore, status }) => (
-                  <tr key={org.id} className="border-b border-[#e5e5e5] last:border-0">
+                {clientOrgs.map(({ id, name, employeeCount }) => (
+                  <tr key={id} className="border-b border-[#e5e5e5] last:border-0">
                     <td className="py-3 pr-4 font-medium text-[#000000]">
-                      {org.name ?? "—"}
+                      {name ?? "—"}
                     </td>
-                    <td className="py-3 pr-4 text-[#000000]">{employeeCount}</td>
-                    <td className="py-3 pr-4 text-[#000000]">{activeCampaigns}</td>
-                    <td className="py-3 pr-4 text-[#000000]">
-                      {avgRiskScore != null ? `${avgRiskScore}/100` : "—"}
-                    </td>
-                    <td className="py-3 text-[#6b6b6b]">{status}</td>
+                    <td className="py-3 text-[#000000]">{employeeCount}</td>
                   </tr>
                 ))}
               </tbody>
