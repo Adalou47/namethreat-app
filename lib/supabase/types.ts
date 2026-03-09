@@ -166,6 +166,26 @@ export type ReportsRow = {
   updated_at: string | null;
 };
 
+export type IntegrationsRow = {
+  id: string;
+  organisation_id: string | null;
+  provider: string | null;
+  status: string | null;
+  config_json: Json | null;
+  last_sync_at: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
+export type SyncLogsRow = {
+  id: string;
+  organisation_id: string | null;
+  integration_id: string | null;
+  status: string | null;
+  records_synced: number | null;
+  created_at: string | null;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -359,6 +379,34 @@ export type Database = {
           updated_at?: string | null;
         };
         Update: Partial<ReportsRow>;
+        Relationships: [];
+      };
+      integrations: {
+        Row: IntegrationsRow;
+        Insert: {
+          id?: string;
+          organisation_id?: string | null;
+          provider?: string | null;
+          status?: string | null;
+          config_json?: Json | null;
+          last_sync_at?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: Partial<IntegrationsRow>;
+        Relationships: [];
+      };
+      sync_logs: {
+        Row: SyncLogsRow;
+        Insert: {
+          id?: string;
+          organisation_id?: string | null;
+          integration_id?: string | null;
+          status?: string | null;
+          records_synced?: number | null;
+          created_at?: string | null;
+        };
+        Update: Partial<SyncLogsRow>;
         Relationships: [];
       };
     };
