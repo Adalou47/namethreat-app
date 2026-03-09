@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
+import type { PhishingCampaignsRow } from "../../../../../lib/supabase/types";
 import { CampaignDetailClient } from "./campaign-detail-client";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -28,7 +29,7 @@ export default async function CampaignDetailPage({
   if (!dbUser || (dbUser.organisation_id == null && dbUser.msp_id == null)) redirect("/onboarding/msp");
 
   const { id } = await params;
-  let campaign: { id: string; organisation_id: string | null; [key: string]: unknown } | null = null;
+  let campaign: PhishingCampaignsRow | null = null;
   if (dbUser.msp_id) {
     const { data: clientOrgs } = await supabase
       .from("organisations")
@@ -42,7 +43,7 @@ export default async function CampaignDetailPage({
         .eq("id", id)
         .in("organisation_id", orgIds)
         .maybeSingle();
-      campaign = res.data;
+      campaign = res.data as PhishingCampaignsRow | null;
     }
   } else if (dbUser.organisation_id) {
     const res = await supabase
@@ -51,7 +52,7 @@ export default async function CampaignDetailPage({
       .eq("id", id)
       .eq("organisation_id", dbUser.organisation_id)
       .maybeSingle();
-    campaign = res.data;
+    campaign = res.data as PhishingCampaignsRow | null;
   }
 
   if (!campaign) notFound();
