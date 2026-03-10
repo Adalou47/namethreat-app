@@ -209,7 +209,10 @@ function DashboardMspView({
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
+            <Building2 className="h-4 w-4" />
+          </div>
           <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Total Clients
           </p>
@@ -217,7 +220,10 @@ function DashboardMspView({
             {totalClients}
           </p>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
+            <Users className="h-4 w-4" />
+          </div>
           <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Total Employees
           </p>
@@ -225,7 +231,10 @@ function DashboardMspView({
             {totalEmployees}
           </p>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
+            <Mail className="h-4 w-4" />
+          </div>
           <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Active Campaigns
           </p>
@@ -233,7 +242,10 @@ function DashboardMspView({
             {totalActiveCampaigns}
           </p>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
+            <Shield className="h-4 w-4" />
+          </div>
           <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Avg Risk Score
           </p>
@@ -244,7 +256,7 @@ function DashboardMspView({
       </section>
 
       {clientOrgs.length === 0 && (
-        <div className="rounded-xl border border-neutral-200 bg-white p-12 text-center shadow-sm">
+        <div className="rounded-xl border border-neutral-200 bg-white p-12 text-center shadow-sm transition-shadow duration-200 hover:shadow-md">
           <Building2 className="mx-auto h-8 w-8 text-neutral-300" />
           <h2 className="mt-3 text-sm font-medium text-neutral-950">Add your first client</h2>
           <p className="mt-1 text-sm text-neutral-500">
@@ -285,7 +297,7 @@ function DashboardMspView({
       )}
 
       {clientOrgs.length > 0 && (
-        <section className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
+        <section className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
           <div className="border-b border-neutral-200 bg-neutral-50 px-4 py-3">
             <h2 className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
               Client Organisations
@@ -317,7 +329,7 @@ function DashboardMspView({
       )}
 
       {recentCampaigns.length > 0 && (
-        <section className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <section className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
           <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Recent activity
           </p>
@@ -347,7 +359,7 @@ function DashboardMspView({
             Quick Actions
           </p>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
               <h3 className="text-base font-semibold text-neutral-950">
                 Add Client
               </h3>
@@ -361,7 +373,7 @@ function DashboardMspView({
                 Get Started
               </Link>
             </div>
-            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
               <h3 className="text-base font-semibold text-neutral-950">
                 Launch Campaign
               </h3>
@@ -375,7 +387,7 @@ function DashboardMspView({
                 Get Started
               </Link>
             </div>
-            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
               <h3 className="text-base font-semibold text-neutral-950">
                 View Reports
               </h3>
@@ -419,7 +431,10 @@ function DashboardOrgView({
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
+            <Users className="h-4 w-4" />
+          </div>
           <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Total Employees
           </p>
@@ -427,7 +442,10 @@ function DashboardOrgView({
             {totalEmployees}
           </p>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
+            <Mail className="h-4 w-4" />
+          </div>
           <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Active Campaigns
           </p>
@@ -435,7 +453,10 @@ function DashboardOrgView({
             {activeCampaigns}
           </p>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
+            <Shield className="h-4 w-4" />
+          </div>
           <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Avg Risk Score
           </p>
@@ -443,7 +464,10 @@ function DashboardOrgView({
             0/100
           </p>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
+          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-green-50 text-green-600">
+            <CheckCircle className="h-4 w-4" />
+          </div>
           <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Training Completion
           </p>
@@ -454,7 +478,7 @@ function DashboardOrgView({
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
           <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Recent Campaigns
           </p>
@@ -469,7 +493,7 @@ function DashboardOrgView({
             </Link>
           </div>
         </div>
-        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
           <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Risk Overview
           </p>
@@ -488,7 +512,7 @@ function DashboardOrgView({
           Quick Actions
         </p>
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <h3 className="text-base font-semibold text-neutral-950">
               Import Employees
             </h3>
@@ -502,7 +526,7 @@ function DashboardOrgView({
               Get Started
             </Link>
           </div>
-          <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <h3 className="text-base font-semibold text-neutral-950">
               Launch Campaign
             </h3>
@@ -516,7 +540,7 @@ function DashboardOrgView({
               Get Started
             </Link>
           </div>
-          <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
             <h3 className="text-base font-semibold text-neutral-950">
               View Reports
             </h3>

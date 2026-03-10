@@ -1,6 +1,5 @@
 # namethreat — Design System
 > Version 1.0 — March 2026
-> Paste this document into Cursor when redesigning any page or component.
 
 ---
 
@@ -12,7 +11,7 @@
 - Color is reserved for risk signals only (never decoration)
 - Rounded corners, generous spacing, clean cards
 - Feels like Linear/Vercel/Notion but with the data density of a security dashboard
-- No gradients. No shadows except one subtle card shadow. No animations except subtle transitions.
+- No gradients. Shadows used intentionally for depth — cards have shadow-sm, hover reveals shadow-md. No flat UI.
 
 ---
 
@@ -127,15 +126,30 @@ Avatars:        rounded-full
 
 ## Shadows
 
-Minimal. Only one shadow style used across the entire app.
+Shadows add depth and make the UI feel finished. Use them intentionally.
+
+```
+Cards (standard):       shadow-sm
+Cards (hover state):    shadow-md  (on hover, with transition)
+Stat cards:             shadow-sm, hover:shadow-md
+Modals / popovers:      shadow-xl
+Dropdowns:              shadow-lg
+Buttons:                no shadow
+Sidebar:                no shadow (border-r is enough)
+Table rows:             no shadow
+```
 
 ```css
-/* Card shadow — subtle, only on white cards on white/gray bg */
-box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+/* Tailwind shadow scale reference */
+shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)   /* default cards */
+shadow-md:  0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05)   /* hover cards */
+shadow-lg:  0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.05) /* dropdowns */
+shadow-xl:  0 20px 25px rgba(0,0,0,0.10), 0 8px 10px rgba(0,0,0,0.06) /* modals */
+```
 
-/* Tailwind: shadow-sm */
-/* Use on: cards, dropdowns, modals */
-/* Never use on: buttons, sidebar items, table rows */
+Card hover pattern (makes cards feel interactive and alive):
+```
+className="... shadow-sm hover:shadow-md transition-shadow duration-200"
 ```
 
 ---
@@ -178,13 +192,22 @@ Icons:
 ```
 Standard card:
   bg-white rounded-xl border border-neutral-200 shadow-sm p-5
+  hover: shadow-md transition-shadow duration-200
 
 Stat card (dashboard KPI):
   bg-white rounded-xl border border-neutral-200 shadow-sm p-5
-  - Micro label at top: text-[11px] uppercase tracking-wider text-neutral-500
-  - Big number: text-[32px] font-bold
-  - Trend indicator: text-sm with colored arrow (green/red only for direction)
-  - Status badge at bottom
+  hover: shadow-md transition-shadow duration-200
+  - Icon: small rounded-lg bg-neutral-100 p-2 flex items-center justify-center (top left)
+  - Micro label: text-[11px] uppercase tracking-wider text-neutral-500
+  - Big number: text-[32px] font-bold text-neutral-950
+  - Trend indicator: text-[13px] with green/red arrow for direction
+  - Status badge at bottom: rounded-full pill
+
+  Icon backgrounds on stat cards (subtle tint, not full color):
+    Risk/alert icons:   bg-red-50 text-red-500
+    Activity icons:     bg-neutral-100 text-neutral-600
+    Success icons:      bg-green-50 text-green-600
+    Info icons:         bg-blue-50 text-blue-500
 
 Subtle inner section:
   bg-neutral-50 rounded-lg p-4
@@ -355,7 +378,7 @@ Requirements:
 - No gradients (`bg-gradient-*`)
 - No colored card backgrounds — white only, or `bg-neutral-50` for subtle sections
 - No purple, blue, indigo, or brand accent colors anywhere except risk indicators
-- No heavy shadows (`shadow-lg`, `shadow-xl`)
+- No `shadow-xl` on cards — reserve it for modals only
 - No border-radius below `rounded-lg` (8px minimum everywhere)
 - No font sizes below 11px
 - No colored sidebar items — active state is black pill only
