@@ -92,10 +92,13 @@ export default async function PhishingResultsPage({
   });
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-xl font-semibold text-[#000000]">Phishing Results</h1>
-        <p className="mt-1 text-sm text-[#6b6b6b]">
+    <div className="space-y-8">
+      <header className="mb-6">
+        <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+          Simulations
+        </p>
+        <h1 className="text-2xl font-bold text-neutral-950">Phishing Results</h1>
+        <p className="mt-1 text-sm text-neutral-500">
           View results across all campaigns
         </p>
       </header>

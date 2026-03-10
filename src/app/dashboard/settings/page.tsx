@@ -23,10 +23,13 @@ export default async function SettingsPage() {
   if (!dbUser || (dbUser.organisation_id == null && dbUser.msp_id == null)) redirect("/onboarding/msp");
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-xl font-semibold text-[#000000]">Settings</h1>
-        <p className="mt-1 text-sm text-[#6b6b6b]">
+    <div className="space-y-8">
+      <header className="mb-6">
+        <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+          Organisation
+        </p>
+        <h1 className="text-2xl font-bold text-neutral-950">Settings</h1>
+        <p className="mt-1 text-sm text-neutral-500">
           Manage your organisation settings
         </p>
       </header>
@@ -35,15 +38,15 @@ export default async function SettingsPage() {
         {SETTINGS_SECTIONS.map(({ title, icon: Icon }) => (
           <section
             key={title}
-            className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-5"
+            className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm"
           >
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-[4px] border border-[#e5e5e5] bg-white text-[#6b6b6b]">
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-neutral-200 text-neutral-500">
                 <Icon className="h-5 w-5" />
               </span>
               <div>
-                <h2 className="text-sm font-semibold text-[#000000]">{title}</h2>
-                <p className="text-xs text-[#6b6b6b]">Coming soon</p>
+                <h2 className="text-sm font-semibold text-neutral-950">{title}</h2>
+                <p className="text-xs text-neutral-500">Coming soon</p>
               </div>
             </div>
           </section>

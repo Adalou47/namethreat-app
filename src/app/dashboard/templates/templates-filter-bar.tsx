@@ -32,13 +32,13 @@ export function TemplatesFilterBar({
   currentCountry,
 }: Props) {
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] px-4 py-3">
-      <span className="text-xs font-medium uppercase tracking-wider text-[#6b6b6b]">
+    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 shadow-sm">
+      <span className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
         Category
       </span>
       <Link
         href={buildUrl({ category: null, difficulty: currentDifficulty, country: currentCountry })}
-        className={`rounded-[4px] border px-3 py-1.5 text-sm ${!currentCategory ? "border-[#000000] bg-[#000000] text-white" : "border-[#e5e5e5] bg-white text-[#000000] hover:bg-[#e5e5e5]"}`}
+        className={`rounded-lg border px-3 py-1.5 text-sm transition-colors duration-150 ${!currentCategory ? "border-neutral-950 bg-neutral-950 text-white hover:bg-neutral-800" : "border-neutral-200 bg-white text-neutral-950 hover:bg-neutral-50"}`}
       >
         All
       </Link>
@@ -52,13 +52,13 @@ export function TemplatesFilterBar({
               difficulty: currentDifficulty,
               country: currentCountry,
             })}
-            className={`rounded-[4px] border px-3 py-1.5 text-sm ${isSelected ? "border-[#000000] bg-[#000000] text-white" : "border-[#e5e5e5] bg-white text-[#000000] hover:bg-[#e5e5e5]"}`}
+            className={`rounded-lg border px-3 py-1.5 text-sm transition-colors duration-150 ${isSelected ? "border-neutral-950 bg-neutral-950 text-white hover:bg-neutral-800" : "border-neutral-200 bg-white text-neutral-950 hover:bg-neutral-50"}`}
           >
             {getCategoryDisplayName(c) || c}
           </Link>
         );
       })}
-      <span className="ml-2 border-l border-[#e5e5e5] pl-3 text-xs font-medium uppercase tracking-wider text-[#6b6b6b]">
+      <span className="ml-2 border-l border-neutral-200 pl-3 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
         Difficulty
       </span>
       {DIFFICULTIES.map(({ value, label }) => {
@@ -71,13 +71,13 @@ export function TemplatesFilterBar({
               difficulty: isSelected ? undefined : value,
               country: currentCountry,
             })}
-            className={`rounded-[4px] border px-3 py-1.5 text-sm ${isSelected ? "border-[#000000] bg-[#000000] text-white" : "border-[#e5e5e5] bg-white text-[#000000] hover:bg-[#e5e5e5]"}`}
+            className={`rounded-lg border px-3 py-1.5 text-sm transition-colors duration-150 ${isSelected ? "border-neutral-950 bg-neutral-950 text-white hover:bg-neutral-800" : "border-neutral-200 bg-white text-neutral-950 hover:bg-neutral-50"}`}
           >
             {label}
           </Link>
         );
       })}
-      <span className="ml-2 border-l border-[#e5e5e5] pl-3 text-xs font-medium uppercase tracking-wider text-[#6b6b6b]">
+      <span className="ml-2 border-l border-neutral-200 pl-3 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
         Country
       </span>
       {COUNTRIES.map((c) => {
@@ -90,7 +90,7 @@ export function TemplatesFilterBar({
               difficulty: currentDifficulty,
               country: isSelected ? undefined : c,
             })}
-            className={`rounded-[4px] border px-3 py-1.5 text-sm ${isSelected ? "border-[#000000] bg-[#000000] text-white" : "border-[#e5e5e5] bg-white text-[#000000] hover:bg-[#e5e5e5]"}`}
+            className={`rounded-lg border px-3 py-1.5 text-sm transition-colors duration-150 ${isSelected ? "border-neutral-950 bg-neutral-950 text-white hover:bg-neutral-800" : "border-neutral-200 bg-white text-neutral-950 hover:bg-neutral-50"}`}
           >
             {c}
           </Link>

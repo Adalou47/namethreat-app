@@ -5,11 +5,11 @@ import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import { Mail, Plus } from "lucide-react";
 
 const STATUS_STYLES: Record<string, string> = {
-  draft: "bg-[#e5e5e5] text-[#6b6b6b]",
-  scheduled: "bg-blue-100 text-blue-800",
-  active: "bg-green-100 text-green-800",
-  completed: "bg-[#000000] text-white",
-  cancelled: "bg-red-100 text-red-800",
+  draft: "bg-neutral-100 text-neutral-500",
+  scheduled: "bg-neutral-100 text-neutral-500",
+  active: "bg-green-50 text-green-600",
+  completed: "bg-neutral-950 text-white",
+  cancelled: "bg-red-50 text-red-500",
 };
 
 export default async function CampaignsPage() {
@@ -59,17 +59,20 @@ export default async function CampaignsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-wrap items-center justify-between gap-4">
+    <div className="space-y-8">
+      <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-[#000000]">Phishing Campaigns</h1>
-          <p className="mt-1 text-sm text-[#6b6b6b]">
+          <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+            Simulations
+          </p>
+          <h1 className="text-2xl font-bold text-neutral-950">Phishing Campaigns</h1>
+          <p className="mt-1 text-sm text-neutral-500">
             Create and manage phishing simulations
           </p>
         </div>
         <Link
           href="/dashboard/campaigns/new"
-          className="inline-flex items-center gap-2 rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+          className="inline-flex items-center gap-2 rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
         >
           <Plus className="h-4 w-4" />
           Create Campaign
@@ -77,91 +80,93 @@ export default async function CampaignsPage() {
       </header>
 
       {!campaigns?.length ? (
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-12 text-center">
-          <Mail className="mx-auto mb-3 h-12 w-12 text-[#6b6b6b]" />
-          <p className="text-sm font-medium text-[#000000]">No campaigns yet.</p>
-          <p className="mt-1 text-sm text-[#6b6b6b]">
+        <div className="rounded-xl border border-neutral-200 bg-white p-12 text-center shadow-sm">
+          <Mail className="mx-auto h-8 w-8 text-neutral-300" />
+          <p className="mt-3 text-sm font-medium text-neutral-950">No campaigns yet.</p>
+          <p className="mt-1 text-sm text-neutral-500">
             Create your first phishing simulation.
           </p>
           <Link
             href="/dashboard/campaigns/new"
-            className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+            className="mt-4 inline-block rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
           >
             Create Campaign
           </Link>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5]">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-[#e5e5e5]">
-                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Name</th>
-                {isMspAdmin && (
-                  <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Client</th>
-                )}
-                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Status</th>
-                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Targets</th>
-                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Sent</th>
-                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Clicked</th>
-                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Click Rate</th>
-                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Created</th>
-                <th className="pb-3 font-medium text-[#6b6b6b]">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {campaigns.map((c) => (
-                <tr
-                  key={c.id}
-                  className="border-b border-[#e5e5e5] last:border-0 hover:bg-white/50"
-                >
-                  <td className="py-3 pr-4">
-                    <Link
-                      href={`/dashboard/campaigns/${c.id}`}
-                      className="font-medium text-[#000000] hover:underline"
-                    >
-                      {c.name ?? "Unnamed"}
-                    </Link>
-                  </td>
+        <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-neutral-200 bg-neutral-50">
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Name</th>
                   {isMspAdmin && (
-                    <td className="py-3 pr-4 text-[#6b6b6b]">
+                    <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Client</th>
+                  )}
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Status</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Targets</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Sent</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Clicked</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Click Rate</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Created</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {campaigns.map((c) => (
+                  <tr
+                    key={c.id}
+                    className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50"
+                  >
+                    <td className="px-4 py-3">
                       <Link
-                        href={`/dashboard/clients/${c.organisation_id}`}
-                        className="hover:underline"
+                        href={`/dashboard/campaigns/${c.id}`}
+                        className="font-medium text-neutral-950 hover:underline"
                       >
-                        {orgNames[c.organisation_id ?? ""] ?? "—"}
+                        {c.name ?? "Unnamed"}
                       </Link>
                     </td>
-                  )}
-                  <td className="py-3 pr-4">
-                    <span
-                      className={`rounded-[4px] px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[c.status ?? ""] ?? "bg-[#e5e5e5] text-[#6b6b6b]"}`}
-                    >
-                      {c.status ?? "—"}
-                    </span>
-                  </td>
-                  <td className="py-3 pr-4 text-[#000000]">{c.total_targets ?? 0}</td>
-                  <td className="py-3 pr-4 text-[#000000]">{c.total_sent ?? 0}</td>
-                  <td className="py-3 pr-4 text-[#000000]">{c.total_clicked ?? 0}</td>
-                  <td className="py-3 pr-4 text-[#000000]">
-                    {c.click_rate != null ? `${c.click_rate}%` : "—"}
-                  </td>
-                  <td className="py-3 pr-4 text-[#6b6b6b]">
-                    {c.created_at
-                      ? new Date(c.created_at).toLocaleDateString()
-                      : "—"}
-                  </td>
-                  <td className="py-3">
-                    <Link
-                      href={`/dashboard/campaigns/${c.id}`}
-                      className="text-sm font-medium text-[#000000] hover:underline"
-                    >
-                      View
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    {isMspAdmin && (
+                      <td className="px-4 py-3 text-neutral-500">
+                        <Link
+                          href={`/dashboard/clients/${c.organisation_id}`}
+                          className="hover:underline"
+                        >
+                          {orgNames[c.organisation_id ?? ""] ?? "—"}
+                        </Link>
+                      </td>
+                    )}
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${STATUS_STYLES[c.status ?? ""] ?? "bg-neutral-100 text-neutral-500"}`}
+                      >
+                        {c.status ?? "—"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-neutral-950">{c.total_targets ?? 0}</td>
+                    <td className="px-4 py-3 text-neutral-950">{c.total_sent ?? 0}</td>
+                    <td className="px-4 py-3 text-neutral-950">{c.total_clicked ?? 0}</td>
+                    <td className="px-4 py-3 text-neutral-950">
+                      {c.click_rate != null ? `${c.click_rate}%` : "—"}
+                    </td>
+                    <td className="px-4 py-3 text-neutral-500">
+                      {c.created_at
+                        ? new Date(c.created_at).toLocaleDateString()
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/dashboard/campaigns/${c.id}`}
+                        className="text-sm font-medium text-neutral-950 hover:underline"
+                      >
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

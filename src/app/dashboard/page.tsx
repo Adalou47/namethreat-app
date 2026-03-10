@@ -195,92 +195,86 @@ function DashboardMspView({
   recentCampaigns: RecentCampaignItem[];
 }) {
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-xl font-semibold text-[#000000]">
+    <div className="space-y-8">
+      <header className="mb-6">
+        <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+          Overview
+        </p>
+        <h1 className="text-2xl font-bold text-neutral-950">
           Welcome back{mspName ? `, ${mspName}` : ""}
         </h1>
+        <p className="mt-1 text-sm text-neutral-500">
+          Your MSP dashboard and client overview
+        </p>
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-[#6b6b6b]" />
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-[#6b6b6b]">
-              Total Clients
-            </span>
-          </div>
-          <p className="text-2xl font-semibold text-[#000000] sm:text-3xl">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+            Total Clients
+          </p>
+          <p className="mt-1 text-[32px] font-bold text-neutral-950">
             {totalClients}
           </p>
         </div>
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <Users className="h-5 w-5 text-[#6b6b6b]" />
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-[#6b6b6b]">
-              Total Employees
-            </span>
-          </div>
-          <p className="text-2xl font-semibold text-[#000000] sm:text-3xl">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+            Total Employees
+          </p>
+          <p className="mt-1 text-[32px] font-bold text-neutral-950">
             {totalEmployees}
           </p>
         </div>
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <Mail className="h-5 w-5 text-[#6b6b6b]" />
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-[#6b6b6b]">
-              Active Campaigns
-            </span>
-          </div>
-          <p className="text-2xl font-semibold text-[#000000] sm:text-3xl">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+            Active Campaigns
+          </p>
+          <p className="mt-1 text-[32px] font-bold text-neutral-950">
             {totalActiveCampaigns}
           </p>
         </div>
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <Shield className="h-5 w-5 text-[#6b6b6b]" />
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-[#6b6b6b]">
-              Avg Risk Score
-            </span>
-          </div>
-          <p className="text-2xl font-semibold text-[#000000] sm:text-3xl">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+            Avg Risk Score
+          </p>
+          <p className="mt-1 text-[32px] font-bold text-neutral-950">
             —
           </p>
         </div>
       </section>
 
       {clientOrgs.length === 0 && (
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-12 text-center">
-          <Building2 className="mx-auto mb-4 h-14 w-14 text-[#6b6b6b]" />
-          <h2 className="text-lg font-semibold text-[#000000]">Add your first client</h2>
-          <p className="mt-2 text-sm text-[#6b6b6b]">
+        <div className="rounded-xl border border-neutral-200 bg-white p-12 text-center shadow-sm">
+          <Building2 className="mx-auto h-8 w-8 text-neutral-300" />
+          <h2 className="mt-3 text-sm font-medium text-neutral-950">Add your first client</h2>
+          <p className="mt-1 text-sm text-neutral-500">
             Add your first client to get started
           </p>
           <Link
             href="/dashboard/clients/new"
-            className="mt-6 inline-block rounded-[4px] bg-[#000000] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+            className="mt-4 inline-block rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
           >
             Add Client
           </Link>
-          <div className="mx-auto mt-10 max-w-md space-y-4 rounded-[6px] border border-[#e5e5e5] bg-white p-6 text-left">
-            <p className="text-sm font-medium text-[#000000]">
+          <div className="mx-auto mt-10 max-w-md space-y-4 rounded-xl border border-neutral-200 bg-neutral-50 p-6 text-left">
+            <p className="text-sm font-medium text-neutral-950">
               How easy it is to get started:
             </p>
-            <ol className="space-y-3 text-sm text-[#6b6b6b]">
+            <ol className="space-y-3 text-sm text-neutral-500">
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e5e5e5] text-xs font-medium text-[#000000]">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-neutral-200 text-[11px] font-medium text-neutral-950">
                   1
                 </span>
                 Add client details (company name, domain, country, industry)
               </li>
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e5e5e5] text-xs font-medium text-[#000000]">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-neutral-200 text-[11px] font-medium text-neutral-950">
                   2
                 </span>
                 Connect Microsoft Entra or import CSV to add employees
               </li>
               <li className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e5e5e5] text-xs font-medium text-[#000000]">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-neutral-200 text-[11px] font-medium text-neutral-950">
                   3
                 </span>
                 Launch your first phishing campaign for the client
@@ -291,27 +285,29 @@ function DashboardMspView({
       )}
 
       {clientOrgs.length > 0 && (
-        <section className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-6">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.15em] text-[#000000]">
-            Client Organisations
-          </h2>
+        <section className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
+          <div className="border-b border-neutral-200 bg-neutral-50 px-4 py-3">
+            <h2 className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+              Client Organisations
+            </h2>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-[#e5e5e5]">
-                  <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Organisation</th>
-                  <th className="pb-3 font-medium text-[#6b6b6b]">Employees</th>
+                <tr className="border-b border-neutral-200 bg-neutral-50">
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Organisation</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Employees</th>
                 </tr>
               </thead>
               <tbody>
                 {clientOrgs.map(({ id, name, employeeCount }) => (
-                  <tr key={id} className="border-b border-[#e5e5e5] last:border-0 hover:bg-white/50">
-                    <td className="py-3 pr-4 font-medium text-[#000000]">
+                  <tr key={id} className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50">
+                    <td className="px-4 py-3 font-medium text-neutral-950">
                       <Link href={`/dashboard/clients/${id}`} className="hover:underline">
                         {name ?? "—"}
                       </Link>
                     </td>
-                    <td className="py-3 text-[#000000]">{employeeCount}</td>
+                    <td className="px-4 py-3 text-neutral-950">{employeeCount}</td>
                   </tr>
                 ))}
               </tbody>
@@ -321,20 +317,20 @@ function DashboardMspView({
       )}
 
       {recentCampaigns.length > 0 && (
-        <section className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-6">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.15em] text-[#000000]">
+        <section className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Recent activity
-          </h2>
+          </p>
           <ul className="space-y-2">
             {recentCampaigns.map((c) => (
               <li key={c.id} className="flex items-center justify-between text-sm">
                 <Link
                   href={`/dashboard/campaigns/${c.id}`}
-                  className="font-medium text-[#000000] hover:underline"
+                  className="font-medium text-neutral-950 hover:underline"
                 >
                   {c.name ?? "Unnamed campaign"}
                 </Link>
-                <span className="text-[#6b6b6b]">
+                <span className="text-neutral-500">
                   {c.created_at
                     ? new Date(c.created_at).toLocaleDateString()
                     : "—"}
@@ -347,48 +343,48 @@ function DashboardMspView({
 
       {clientOrgs.length > 0 && (
         <section>
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.15em] text-[#000000]">
+          <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Quick Actions
-          </h2>
+          </p>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-5">
-              <h3 className="text-base font-semibold text-[#000000]">
+            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+              <h3 className="text-base font-semibold text-neutral-950">
                 Add Client
               </h3>
-              <p className="mt-2 text-sm text-[#6b6b6b]">
+              <p className="mt-2 text-sm text-neutral-500">
                 Onboard a new client organisation
               </p>
               <Link
                 href="/dashboard/clients/new"
-                className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+                className="mt-4 inline-block rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
               >
                 Get Started
               </Link>
             </div>
-            <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-5">
-              <h3 className="text-base font-semibold text-[#000000]">
+            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+              <h3 className="text-base font-semibold text-neutral-950">
                 Launch Campaign
               </h3>
-              <p className="mt-2 text-sm text-[#6b6b6b]">
+              <p className="mt-2 text-sm text-neutral-500">
                 Send a phishing simulation to a client
               </p>
               <Link
                 href="/dashboard/campaigns"
-                className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+                className="mt-4 inline-block rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
               >
                 Get Started
               </Link>
             </div>
-            <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-5">
-              <h3 className="text-base font-semibold text-[#000000]">
+            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+              <h3 className="text-base font-semibold text-neutral-950">
                 View Reports
               </h3>
-              <p className="mt-2 text-sm text-[#6b6b6b]">
+              <p className="mt-2 text-sm text-neutral-500">
                 Download security reports for compliance
               </p>
               <Link
                 href="/dashboard/reports"
-                className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+                className="mt-4 inline-block rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
               >
                 Get Started
               </Link>
@@ -400,7 +396,7 @@ function DashboardMspView({
   );
 }
 
-// Direct company dashboard: single org stats (same 4 cards as before)
+// Direct company dashboard: single org stats
 function DashboardOrgView({
   totalEmployees,
   activeCampaigns,
@@ -411,83 +407,76 @@ function DashboardOrgView({
   roleLabel: string;
 }) {
   return (
-    <div className="space-y-6">
-      <header className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-        <p className="text-sm text-[#6b6b6b]">
-          Signed in as{" "}
-          <span className="font-medium capitalize text-[#000000]">{roleLabel}</span>
+    <div className="space-y-8">
+      <header className="mb-6">
+        <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+          Overview
+        </p>
+        <h1 className="text-2xl font-bold text-neutral-950">Dashboard</h1>
+        <p className="mt-1 text-sm text-neutral-500">
+          Signed in as <span className="font-medium capitalize text-neutral-950">{roleLabel}</span>
         </p>
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <Users className="h-5 w-5 text-[#6b6b6b]" />
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-[#6b6b6b]">
-              Total Employees
-            </span>
-          </div>
-          <p className="text-2xl font-semibold text-[#000000] sm:text-3xl">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+            Total Employees
+          </p>
+          <p className="mt-1 text-[32px] font-bold text-neutral-950">
             {totalEmployees}
           </p>
         </div>
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <Mail className="h-5 w-5 text-[#6b6b6b]" />
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-[#6b6b6b]">
-              Active Campaigns
-            </span>
-          </div>
-          <p className="text-2xl font-semibold text-[#000000] sm:text-3xl">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+            Active Campaigns
+          </p>
+          <p className="mt-1 text-[32px] font-bold text-neutral-950">
             {activeCampaigns}
           </p>
         </div>
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <Shield className="h-5 w-5 text-[#6b6b6b]" />
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-[#6b6b6b]">
-              Avg Risk Score
-            </span>
-          </div>
-          <p className="text-2xl font-semibold text-[#000000] sm:text-3xl">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+            Avg Risk Score
+          </p>
+          <p className="mt-1 text-[32px] font-bold text-neutral-950">
             0/100
           </p>
         </div>
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-[#6b6b6b]" />
-            <span className="text-xs font-medium uppercase tracking-[0.2em] text-[#6b6b6b]">
-              Training Completion
-            </span>
-          </div>
-          <p className="text-2xl font-semibold text-[#000000] sm:text-3xl">
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+            Training Completion
+          </p>
+          <p className="mt-1 text-[32px] font-bold text-neutral-950">
             0%
           </p>
         </div>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-6">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.15em] text-[#000000]">
+        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Recent Campaigns
-          </h2>
+          </p>
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm font-medium text-[#000000]">No campaigns yet</p>
+            <Mail className="h-8 w-8 text-neutral-300" />
+            <p className="mt-3 text-sm font-medium text-neutral-950">No campaigns yet</p>
             <Link
               href="/dashboard/campaigns"
-              className="mt-4 rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+              className="mt-4 rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
             >
               Create Campaign
             </Link>
           </div>
         </div>
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-6">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.15em] text-[#000000]">
+        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Risk Overview
-          </h2>
+          </p>
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm font-medium text-[#000000]">No data yet</p>
-            <p className="mt-1 text-sm text-[#6b6b6b]">
+            <Shield className="h-8 w-8 text-neutral-300" />
+            <p className="mt-3 text-sm font-medium text-neutral-950">No data yet</p>
+            <p className="mt-1 text-sm text-neutral-500">
               Import employees to see risk scores
             </p>
           </div>
@@ -495,48 +484,48 @@ function DashboardOrgView({
       </section>
 
       <section>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.15em] text-[#000000]">
+        <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
           Quick Actions
-        </h2>
+        </p>
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-5">
-            <h3 className="text-base font-semibold text-[#000000]">
+          <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <h3 className="text-base font-semibold text-neutral-950">
               Import Employees
             </h3>
-            <p className="mt-2 text-sm text-[#6b6b6b]">
+            <p className="mt-2 text-sm text-neutral-500">
               Add your team via CSV or Microsoft Entra
             </p>
             <Link
               href="/dashboard/employees"
-              className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+              className="mt-4 inline-block rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
             >
               Get Started
             </Link>
           </div>
-          <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-5">
-            <h3 className="text-base font-semibold text-[#000000]">
+          <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <h3 className="text-base font-semibold text-neutral-950">
               Launch Campaign
             </h3>
-            <p className="mt-2 text-sm text-[#6b6b6b]">
+            <p className="mt-2 text-sm text-neutral-500">
               Send a phishing simulation to your team
             </p>
             <Link
               href="/dashboard/campaigns"
-              className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+              className="mt-4 inline-block rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
             >
               Get Started
             </Link>
           </div>
-          <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-5">
-            <h3 className="text-base font-semibold text-[#000000]">
+          <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <h3 className="text-base font-semibold text-neutral-950">
               View Reports
             </h3>
-            <p className="mt-2 text-sm text-[#6b6b6b]">
+            <p className="mt-2 text-sm text-neutral-500">
               Download security reports for compliance
             </p>
             <Link
               href="/dashboard/reports"
-              className="mt-4 inline-block rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+              className="mt-4 inline-block rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
             >
               Get Started
             </Link>

@@ -26,7 +26,7 @@ export function EntraSyncButton({ organisationId }: { organisationId: string }) 
       type="button"
       onClick={handleSync}
       disabled={loading}
-      className="rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111] disabled:opacity-60"
+      className="rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150 disabled:opacity-60"
     >
       {loading ? "Syncing…" : "Sync Now"}
     </button>

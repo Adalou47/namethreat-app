@@ -17,37 +17,37 @@ export function TemplatesGrid({ templates }: { templates: Template[] }) {
       {templates.map((t) => (
         <div
           key={t.id}
-          className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-4"
+          className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm"
         >
-          <h3 className="font-semibold text-[#000000]">{t.name ?? "Unnamed"}</h3>
+          <h3 className="font-semibold text-neutral-950">{t.name ?? "Unnamed"}</h3>
           <div className="mt-2 flex flex-wrap gap-2">
             {t.category && (
-              <span className="rounded-[4px] bg-white px-2 py-0.5 text-xs text-[#6b6b6b]">
+              <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-500">
                 {getCategoryDisplayName(t.category) || t.category}
               </span>
             )}
             {t.difficulty && (
               <span
-                className={`rounded-[4px] px-2 py-0.5 text-xs font-medium ${
+                className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
                   t.difficulty === "Easy"
-                    ? "bg-green-100 text-green-800"
+                    ? "bg-green-50 text-green-600"
                     : t.difficulty === "Medium"
-                      ? "bg-amber-100 text-amber-800"
-                      : "bg-red-100 text-red-800"
+                      ? "bg-amber-50 text-amber-600"
+                      : "bg-red-50 text-red-500"
                 }`}
               >
                 {t.difficulty}
               </span>
             )}
           </div>
-          <div className="mt-2 text-xs text-[#6b6b6b]">
+          <div className="mt-2 text-xs text-neutral-500">
             {t.target_country && <span>{t.target_country}</span>}
             {t.target_country && t.language && " · "}
             {t.language && <span>{t.language}</span>}
           </div>
           <Link
             href={`/dashboard/templates/${t.id}`}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-[4px] border border-[#e5e5e5] bg-white py-2 text-sm font-medium text-[#000000] hover:bg-[#f5f5f5]"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white py-2 text-sm font-medium text-neutral-950 hover:bg-neutral-50 transition-colors duration-150"
           >
             <Eye className="h-4 w-4" />
             Preview

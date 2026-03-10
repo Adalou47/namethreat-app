@@ -63,14 +63,14 @@ export function ResultsTable({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm text-[#6b6b6b]" htmlFor="campaign-filter">
+        <label className="text-sm text-neutral-500" htmlFor="campaign-filter">
           Filter by campaign
         </label>
         <select
           id="campaign-filter"
           value={currentCampaignId ?? ""}
           onChange={handleCampaignFilter}
-          className="rounded-[4px] border border-[#e5e5e5] bg-white px-3 py-2 text-sm text-[#000000]"
+          className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-950"
         >
           <option value="">All campaigns</option>
           {campaigns.map((c) => (
@@ -82,48 +82,50 @@ export function ResultsTable({
         <button
           type="button"
           onClick={exportCsv}
-          className="rounded-[4px] bg-[#000000] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#111111]"
+          className="rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
         >
           Export CSV
         </button>
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-12 text-center">
-          <BarChart3 className="mx-auto mb-3 h-12 w-12 text-[#6b6b6b]" />
-          <p className="text-sm font-medium text-[#000000]">No results yet.</p>
-          <p className="mt-1 text-sm text-[#6b6b6b]">
+        <div className="rounded-xl border border-neutral-200 bg-white p-12 text-center shadow-sm">
+          <BarChart3 className="mx-auto h-8 w-8 text-neutral-300" />
+          <p className="mt-3 text-sm font-medium text-neutral-950">No results yet.</p>
+          <p className="mt-1 text-sm text-neutral-500">
             Launch a campaign to see results here.
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5]">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-[#e5e5e5]">
-                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Employee</th>
-                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Email</th>
-                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Campaign</th>
-                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Sent</th>
-                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Opened</th>
-                <th className="pb-3 pr-4 font-medium text-[#6b6b6b]">Clicked</th>
-                <th className="pb-3 font-medium text-[#6b6b6b]">Outcome</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-b border-[#e5e5e5] last:border-0">
-                  <td className="py-3 pr-4 font-medium text-[#000000]">{r.employee}</td>
-                  <td className="py-3 pr-4 text-[#000000]">{r.email}</td>
-                  <td className="py-3 pr-4 text-[#000000]">{r.campaign}</td>
-                  <td className="py-3 pr-4 text-[#6b6b6b]">{r.sent}</td>
-                  <td className="py-3 pr-4 text-[#000000]">{r.opened}</td>
-                  <td className="py-3 pr-4 text-[#000000]">{r.clicked}</td>
-                  <td className="py-3 text-[#000000]">{r.outcome}</td>
+        <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-neutral-200 bg-neutral-50">
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Employee</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Email</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Campaign</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Sent</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Opened</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Clicked</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Outcome</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.id} className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50">
+                    <td className="px-4 py-3 font-medium text-neutral-950">{r.employee}</td>
+                    <td className="px-4 py-3 text-neutral-950">{r.email}</td>
+                    <td className="px-4 py-3 text-neutral-950">{r.campaign}</td>
+                    <td className="px-4 py-3 text-neutral-500">{r.sent}</td>
+                    <td className="px-4 py-3 text-neutral-950">{r.opened}</td>
+                    <td className="px-4 py-3 text-neutral-950">{r.clicked}</td>
+                    <td className="px-4 py-3 text-neutral-950">{r.outcome}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

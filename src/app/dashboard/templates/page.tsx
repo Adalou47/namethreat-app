@@ -48,10 +48,13 @@ export default async function TemplatesPage({
   }
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-xl font-semibold text-[#000000]">Phishing Templates</h1>
-        <p className="mt-1 text-sm text-[#6b6b6b]">
+    <div className="space-y-8">
+      <header className="mb-6">
+        <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+          Simulations
+        </p>
+        <h1 className="text-2xl font-bold text-neutral-950">Phishing Templates</h1>
+        <p className="mt-1 text-sm text-neutral-500">
           Browse and preview templates for your campaigns
         </p>
       </header>
@@ -64,12 +67,12 @@ export default async function TemplatesPage({
       />
 
       {!templates?.length ? (
-        <div className="rounded-[6px] border border-[#e5e5e5] bg-[#f5f5f5] p-12 text-center">
-          <Mail className="mx-auto mb-3 h-12 w-12 text-[#6b6b6b]" />
-          <p className="text-sm font-medium text-[#000000]">
+        <div className="rounded-xl border border-neutral-200 bg-white p-12 text-center shadow-sm">
+          <Mail className="mx-auto h-8 w-8 text-neutral-300" />
+          <p className="mt-3 text-sm font-medium text-neutral-950">
             Templates are managed by namethreat.
           </p>
-          <p className="mt-1 text-sm text-[#6b6b6b]">Check back soon.</p>
+          <p className="mt-1 text-sm text-neutral-500">Check back soon.</p>
         </div>
       ) : (
         <TemplatesGrid templates={templates} />
