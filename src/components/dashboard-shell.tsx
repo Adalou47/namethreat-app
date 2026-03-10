@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   LogOut,
+  ChevronsUpDown,
 } from "lucide-react";
 
 type NavItem = { label: string; href: string; icon: React.ComponentType<{ className?: string }> };
@@ -105,20 +106,24 @@ export function DashboardShell({ orgName, userEmail, role = "", mspId, children 
         }`}
       >
         {/* Workspace switcher */}
-        <div className="flex min-w-0 shrink-0 items-center justify-between gap-2">
-          <div className="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg bg-neutral-100 px-3 py-2">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-sm font-semibold text-neutral-600">
+        <div className="mb-4 flex min-w-0 shrink-0 items-center justify-between gap-2">
+          <div className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5 rounded-lg border border-neutral-200 bg-neutral-100 px-2 py-2 transition-colors hover:bg-neutral-200">
+            <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-neutral-800 text-[11px] font-bold text-white">
               N
             </span>
-            <span className="truncate font-semibold text-sm text-neutral-950">namethreat</span>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-[13px] font-semibold text-neutral-950">namethreat</span>
+              <span className="text-[10px] text-neutral-400">Workspace</span>
+            </div>
+            <ChevronsUpDown className="ml-auto h-3 w-3 shrink-0 text-neutral-400" />
           </div>
           <button
             type="button"
-            className="shrink-0 p-2 rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-neutral-950 md:hidden transition-colors duration-150"
+            className="shrink-0 rounded-lg p-2 text-neutral-500 transition-colors duration-150 hover:bg-neutral-100 hover:text-neutral-950 md:hidden"
             aria-label="Close menu"
             onClick={() => setMobileMenuOpen(false)}
           >
-            <X className="h-4 w-4" />
+            <X className="h-[14px] w-[14px]" />
           </button>
         </div>
 
@@ -126,7 +131,7 @@ export function DashboardShell({ orgName, userEmail, role = "", mspId, children 
         <nav className="flex-1 min-h-0 pt-2">
           {navSections.map((section) => (
             <div key={section.label}>
-              <p className="px-3 mt-5 mb-1 text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+              <p className="mb-0.5 mt-5 px-3 text-[11px] font-medium uppercase tracking-widest text-neutral-400">
                 {section.label}
               </p>
               {section.items.length > 0 && (
@@ -141,13 +146,13 @@ export function DashboardShell({ orgName, userEmail, role = "", mspId, children 
                         key={item.href}
                         href={item.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors duration-150 ${
+                        className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-[7px] text-[13px] transition-colors duration-150 ${
                           isActive
                             ? "bg-neutral-950 font-medium text-white hover:bg-neutral-950 hover:text-white"
                             : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950"
                         }`}
                       >
-                        <Icon className="h-4 w-4 shrink-0" />
+                        <Icon className="h-[14px] w-[14px] shrink-0" />
                         <span>{item.label}</span>
                       </Link>
                     );
@@ -166,9 +171,9 @@ export function DashboardShell({ orgName, userEmail, role = "", mspId, children 
           <SignOutButton>
             <button
               type="button"
-              className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-100 transition-colors duration-150"
+              className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-[7px] text-[13px] text-neutral-600 transition-colors duration-150 hover:bg-neutral-100"
             >
-              <LogOut className="h-4 w-4 shrink-0" />
+              <LogOut className="h-[14px] w-[14px] shrink-0" />
               Sign out
             </button>
           </SignOutButton>
