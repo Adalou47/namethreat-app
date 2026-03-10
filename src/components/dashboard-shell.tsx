@@ -101,7 +101,7 @@ export function DashboardShell({ orgName, userEmail, role = "", mspId, children 
         />
       )}
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-neutral-200 bg-white px-3 py-4 transition-transform md:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-neutral-200 bg-neutral-50 px-3 py-4 transition-transform md:translate-x-0 ${
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
