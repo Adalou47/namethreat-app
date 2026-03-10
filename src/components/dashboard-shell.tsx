@@ -123,7 +123,7 @@ export function DashboardShell({ orgName, userEmail, role = "", mspId, children 
             aria-label="Close menu"
             onClick={() => setMobileMenuOpen(false)}
           >
-            <X className="h-[14px] w-[14px]" />
+            <X className="h-[14px] w-[14px] shrink-0" />
           </button>
         </div>
 
