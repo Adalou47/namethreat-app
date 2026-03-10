@@ -82,7 +82,7 @@ export function DashboardShell({ orgName, userEmail, role = "", mspId, children 
               aria-label="Close menu"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <X className="h-4 w-4" strokeWidth={1.5} />
+              <X className="h-4 w-4" />
             </button>
           </div>
           <nav className="flex-1 px-3 py-4">
@@ -104,7 +104,7 @@ export function DashboardShell({ orgName, userEmail, role = "", mspId, children 
                         : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950"
                     }`}
                   >
-                    <Icon className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                    <Icon className="h-4 w-4 shrink-0" />
                     <span>{item.label}</span>
                   </Link>
                 );
@@ -135,7 +135,7 @@ export function DashboardShell({ orgName, userEmail, role = "", mspId, children 
             aria-label="Open menu"
             onClick={() => setMobileMenuOpen(true)}
           >
-            <Menu className="h-4 w-4" strokeWidth={1.5} />
+            <Menu className="h-4 w-4" />
           </button>
           <h1 className="text-xl font-semibold text-neutral-950">{orgName}</h1>
           <div className="flex items-center gap-2">
@@ -144,7 +144,7 @@ export function DashboardShell({ orgName, userEmail, role = "", mspId, children 
               className="p-2 rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-neutral-950 transition-colors duration-150"
               aria-label="Notifications"
             >
-              <Bell className="h-4 w-4" strokeWidth={1.5} />
+              <Bell className="h-4 w-4" />
             </button>
             <UserButton />
           </div>
