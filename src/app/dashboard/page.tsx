@@ -9,6 +9,7 @@ import {
   Shield,
   CheckCircle,
   Building2,
+  BarChart3,
 } from "lucide-react";
 
 type ClientOrgItem = {
@@ -195,68 +196,72 @@ function DashboardMspView({
   recentCampaigns: RecentCampaignItem[];
 }) {
   return (
-    <div className="space-y-8">
-      <header className="mb-6">
-        <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
-          Overview
+    <div>
+      <header className="mb-8">
+        <p className="mb-1 text-[11px] font-medium uppercase tracking-widest text-neutral-400">
+          MSP OVERVIEW
         </p>
         <h1 className="text-2xl font-bold text-neutral-950">
-          Welcome back{mspName ? `, ${mspName}` : ""}
+          Good morning{mspName ? `, ${mspName}` : ""}
         </h1>
         <p className="mt-1 text-sm text-neutral-500">
-          Your MSP dashboard and client overview
+          Here&apos;s your client portfolio overview.
         </p>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
-            <Building2 className="h-4 w-4" />
+          <div className="flex items-center justify-between">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-neutral-100 p-2 text-neutral-600">
+              <Building2 className="h-4 w-4" />
+            </div>
+            <span className="text-[13px] text-neutral-400">—</span>
           </div>
+          <p className="mt-3 text-[32px] font-bold text-neutral-950">{totalClients}</p>
           <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Total Clients
           </p>
-          <p className="mt-1 text-[32px] font-bold text-neutral-950">
-            {totalClients}
-          </p>
         </div>
         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
-            <Users className="h-4 w-4" />
+          <div className="flex items-center justify-between">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-neutral-100 p-2 text-neutral-600">
+              <Users className="h-4 w-4" />
+            </div>
+            <span className="text-[13px] text-neutral-400">—</span>
           </div>
+          <p className="mt-3 text-[32px] font-bold text-neutral-950">{totalEmployees}</p>
           <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Total Employees
           </p>
-          <p className="mt-1 text-[32px] font-bold text-neutral-950">
-            {totalEmployees}
-          </p>
         </div>
         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
-            <Mail className="h-4 w-4" />
+          <div className="flex items-center justify-between">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-orange-50 p-2 text-orange-500">
+              <Mail className="h-4 w-4" />
+            </div>
+            <span className="text-[13px] text-neutral-400">—</span>
           </div>
+          <p className="mt-3 text-[32px] font-bold text-neutral-950">{totalActiveCampaigns}</p>
           <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Active Campaigns
           </p>
-          <p className="mt-1 text-[32px] font-bold text-neutral-950">
-            {totalActiveCampaigns}
-          </p>
         </div>
         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
-            <Shield className="h-4 w-4" />
+          <div className="flex items-center justify-between">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-red-50 p-2 text-red-500">
+              <Shield className="h-4 w-4" />
+            </div>
+            <span className="text-[13px] text-neutral-400">—</span>
           </div>
+          <p className="mt-3 text-[32px] font-bold text-neutral-950">—</p>
           <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Avg Risk Score
-          </p>
-          <p className="mt-1 text-[32px] font-bold text-neutral-950">
-            —
           </p>
         </div>
       </section>
 
       {clientOrgs.length === 0 && (
-        <div className="rounded-xl border border-neutral-200 bg-white p-12 text-center shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div className="mb-8 rounded-xl border border-neutral-200 bg-white p-12 text-center shadow-sm transition-shadow duration-200 hover:shadow-md">
           <Building2 className="mx-auto h-8 w-8 text-neutral-300" />
           <h2 className="mt-3 text-sm font-medium text-neutral-950">Add your first client</h2>
           <p className="mt-1 text-sm text-neutral-500">
@@ -264,7 +269,7 @@ function DashboardMspView({
           </p>
           <Link
             href="/dashboard/clients/new"
-            className="mt-4 inline-block rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
+            className="mt-4 inline-block rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-neutral-800"
           >
             Add Client
           </Link>
@@ -297,39 +302,52 @@ function DashboardMspView({
       )}
 
       {clientOrgs.length > 0 && (
-        <section className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
-          <div className="border-b border-neutral-200 bg-neutral-50 px-4 py-3">
-            <h2 className="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
-              Client Organisations
-            </h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-neutral-200 bg-neutral-50">
-                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Organisation</th>
-                  <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Employees</th>
-                </tr>
-              </thead>
-              <tbody>
-                {clientOrgs.map(({ id, name, employeeCount }) => (
-                  <tr key={id} className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50">
-                    <td className="px-4 py-3 font-medium text-neutral-950">
-                      <Link href={`/dashboard/clients/${id}`} className="hover:underline">
-                        {name ?? "—"}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-neutral-950">{employeeCount}</td>
+        <section className="mb-8">
+          <p className="mb-3 text-[11px] font-medium uppercase tracking-widest text-neutral-400">
+            Client Organisations
+          </p>
+          <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-neutral-200 bg-neutral-50">
+                    <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Organisation</th>
+                    <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Employees</th>
+                    <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Active Campaigns</th>
+                    <th className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-wider text-neutral-500">Risk Score</th>
+                    <th className="px-4 py-3 text-right text-[11px] font-medium uppercase tracking-wider text-neutral-500"> </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {clientOrgs.map(({ id, name, employeeCount }) => (
+                    <tr key={id} className="border-b border-neutral-100 last:border-0 transition-colors hover:bg-neutral-50">
+                      <td className="px-4 py-3 font-medium text-neutral-950">
+                        <Link href={`/dashboard/clients/${id}`} className="hover:underline">
+                          {name ?? "—"}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3 text-neutral-950">{employeeCount}</td>
+                      <td className="px-4 py-3 text-neutral-950">—</td>
+                      <td className="px-4 py-3 text-neutral-950">—</td>
+                      <td className="px-4 py-3 text-right">
+                        <Link
+                          href={`/dashboard/clients/${id}`}
+                          className="inline-block rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-medium text-neutral-950 transition-colors hover:bg-neutral-50"
+                        >
+                          View
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
       )}
 
       {recentCampaigns.length > 0 && (
-        <section className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <section className="mb-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
           <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
             Recent activity
           </p>
@@ -354,49 +372,52 @@ function DashboardMspView({
       )}
 
       {clientOrgs.length > 0 && (
-        <section>
-          <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-neutral-500">
+        <section className="mb-8">
+          <p className="mb-4 text-[11px] font-medium uppercase tracking-widest text-neutral-400">
             Quick Actions
           </p>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
-              <h3 className="text-base font-semibold text-neutral-950">
-                Add Client
-              </h3>
-              <p className="mt-2 text-sm text-neutral-500">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
+                <Building2 className="h-4 w-4" />
+              </div>
+              <h3 className="mt-3 text-base font-semibold text-neutral-950">Add Client</h3>
+              <p className="mt-1 text-sm text-neutral-500">
                 Onboard a new client organisation
               </p>
               <Link
                 href="/dashboard/clients/new"
-                className="mt-4 inline-block rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
+                className="mt-4 inline-block rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-neutral-50"
               >
                 Get Started
               </Link>
             </div>
             <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
-              <h3 className="text-base font-semibold text-neutral-950">
-                Launch Campaign
-              </h3>
-              <p className="mt-2 text-sm text-neutral-500">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50 text-orange-500">
+                <Mail className="h-4 w-4" />
+              </div>
+              <h3 className="mt-3 text-base font-semibold text-neutral-950">Launch Campaign</h3>
+              <p className="mt-1 text-sm text-neutral-500">
                 Send a phishing simulation to a client
               </p>
               <Link
                 href="/dashboard/campaigns"
-                className="mt-4 inline-block rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
+                className="mt-4 inline-block rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-neutral-50"
               >
                 Get Started
               </Link>
             </div>
             <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
-              <h3 className="text-base font-semibold text-neutral-950">
-                View Reports
-              </h3>
-              <p className="mt-2 text-sm text-neutral-500">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
+                <BarChart3 className="h-4 w-4" />
+              </div>
+              <h3 className="mt-3 text-base font-semibold text-neutral-950">View Reports</h3>
+              <p className="mt-1 text-sm text-neutral-500">
                 Download security reports for compliance
               </p>
               <Link
                 href="/dashboard/reports"
-                className="mt-4 inline-block rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
+                className="mt-4 inline-block rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-neutral-50"
               >
                 Get Started
               </Link>
