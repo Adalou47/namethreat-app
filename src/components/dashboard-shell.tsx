@@ -55,7 +55,7 @@ export function DashboardShell({ orgName, userEmail, role = "", mspId, children 
   const navItems = getNavItems(role);
 
   return (
-    <div className="flex min-h-screen bg-[#ffffff] text-[#000000]">
+    <div className="flex min-h-screen bg-white text-neutral-950">
       {/* Mobile overlay */}
       {mobileMenuOpen && (
         <button
@@ -66,51 +66,59 @@ export function DashboardShell({ orgName, userEmail, role = "", mspId, children 
         />
       )}
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-full w-[240px] flex-col border-r border-[#e5e5e5] bg-white transition-transform md:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 flex h-full w-64 flex-col border-r border-neutral-200 bg-white transition-transform md:translate-x-0 ${
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-1 flex-col">
-          <div className="flex items-center justify-between border-b border-[#e5e5e5] px-4 py-3 md:px-6 md:py-5">
-            <span className="text-lg font-bold text-[#000000]">namethreat</span>
+          {/* Workspace / brand */}
+          <div className="flex items-center justify-between border-b border-neutral-200 px-3 py-4">
+            <div className="flex min-w-0 flex-1 items-center gap-2 rounded-lg bg-neutral-100 p-2">
+              <span className="truncate text-sm font-semibold text-neutral-950">namethreat</span>
+            </div>
             <button
               type="button"
-              className="rounded p-2 text-[#6b6b6b] hover:bg-[#f5f5f5] md:hidden"
+              className="ml-2 p-2 rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-neutral-950 md:hidden transition-colors duration-150"
               aria-label="Close menu"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" strokeWidth={1.5} />
             </button>
           </div>
-          <nav className="flex-1 space-y-0.5 px-3 py-4">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 rounded-[4px] px-3 py-2.5 text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-[#000000] text-white"
-                      : "text-[#000000] hover:bg-[#f5f5f5]"
-                  }`}
-                >
-                  <Icon className="h-5 w-5 shrink-0" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
+          <nav className="flex-1 px-3 py-4">
+            <p className="px-3 py-2 mt-0 mb-1 text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+              Navigation
+            </p>
+            <div className="space-y-0.5">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors duration-150 ${
+                      isActive
+                        ? "bg-neutral-950 text-white font-medium"
+                        : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
           </nav>
-          <div className="border-t border-[#e5e5e5] px-4 py-4">
-            <p className="truncate px-2 text-xs text-[#6b6b6b]" title={userEmail}>
+          <div className="border-t border-neutral-200 px-3 py-4">
+            <p className="truncate px-3 text-[13px] text-neutral-500" title={userEmail}>
               {userEmail}
             </p>
             <SignOutButton>
               <button
                 type="button"
-                className="mt-2 w-full rounded-[4px] bg-[#000000] px-3 py-2 text-xs font-medium text-white hover:bg-[#111111]"
+                className="mt-2 w-full rounded-lg bg-neutral-950 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors duration-150"
               >
                 Sign out
               </button>
@@ -119,24 +127,24 @@ export function DashboardShell({ orgName, userEmail, role = "", mspId, children 
         </div>
       </aside>
 
-      <div className="flex flex-1 flex-col pl-0 md:pl-[240px]">
-        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-[#e5e5e5] bg-white px-4 py-4 md:px-6">
+      <div className="flex flex-1 flex-col pl-0 md:pl-64">
+        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-4 md:px-6">
           <button
             type="button"
-            className="mr-2 rounded p-2 text-[#6b6b6b] hover:bg-[#f5f5f5] md:hidden"
+            className="mr-2 p-2 rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-neutral-950 md:hidden transition-colors duration-150"
             aria-label="Open menu"
             onClick={() => setMobileMenuOpen(true)}
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="h-4 w-4" strokeWidth={1.5} />
           </button>
-          <h1 className="text-lg font-semibold text-[#000000]">{orgName}</h1>
-          <div className="flex items-center gap-3">
+          <h1 className="text-xl font-semibold text-neutral-950">{orgName}</h1>
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              className="rounded-[4px] p-2 text-[#6b6b6b] hover:bg-[#f5f5f5] hover:text-[#000000]"
+              className="p-2 rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-neutral-950 transition-colors duration-150"
               aria-label="Notifications"
             >
-              <Bell className="h-5 w-5" />
+              <Bell className="h-4 w-4" strokeWidth={1.5} />
             </button>
             <UserButton />
           </div>
