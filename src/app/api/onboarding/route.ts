@@ -122,6 +122,7 @@ export async function POST(req: NextRequest) {
         .single<MspsRow>();
 
       if (mspError || !msp) {
+        console.error("[onboarding] MSP insert failed:", mspError?.code, mspError?.message, mspError?.details);
         return NextResponse.json(
           { error: mspError?.message ?? "Failed to create MSP" },
           { status: 500 },
@@ -129,22 +130,28 @@ export async function POST(req: NextRequest) {
       }
 
       // MSPs do not have their own organisation; they manage client organisations.
+      // Use upsert so duplicate POST (e.g. retry) updates existing user instead of failing.
+      const mspUserPayload = {
+        clerk_user_id: userId,
+        organisation_id: null as string | null,
+        msp_id: msp.id,
+        email: email ?? null,
+        full_name: fullName ?? null,
+        role: "msp_admin",
+        is_active: true,
+        onboarding_complete: true,
+      };
       const { data: user, error: userError } = await supabase
         .from("users")
-        .insert({
-          clerk_user_id: userId,
-          organisation_id: null,
-          msp_id: msp.id,
-          email,
-          full_name: fullName,
-          role: "msp_admin",
-          is_active: true,
-          onboarding_complete: true,
+        .upsert(mspUserPayload, {
+          onConflict: "clerk_user_id",
+          ignoreDuplicates: false,
         })
         .select()
         .single<UserRow>();
 
       if (userError || !user) {
+        console.error("[onboarding] User upsert (MSP) failed:", userError?.code, userError?.message, userError?.details);
         return NextResponse.json(
           { error: userError?.message ?? "Failed to create user" },
           { status: 500 },
@@ -196,28 +203,35 @@ export async function POST(req: NextRequest) {
       .single<OrganisationRow>();
 
     if (orgError) {
+      console.error("[onboarding] Organisation insert failed:", orgError.code, orgError.message, orgError.details);
       throw new Error(orgError.message);
     }
     if (!organisation) {
       throw new Error("Failed to create organisation");
     }
 
+    // Use upsert so duplicate POST (e.g. retry) updates existing user instead of failing.
+    const directUserPayload = {
+      clerk_user_id: userId,
+      organisation_id: organisation.id,
+      msp_id: null as string | null,
+      email: email ?? null,
+      full_name: fullName ?? null,
+      role: "org_admin",
+      is_active: true,
+      onboarding_complete: false,
+    };
     const { data: user, error: userError } = await supabase
       .from("users")
-      .insert({
-        clerk_user_id: userId,
-        organisation_id: organisation.id,
-        msp_id: null,
-        email,
-        full_name: fullName,
-        role: "org_admin",
-        is_active: true,
-        onboarding_complete: false,
+      .upsert(directUserPayload, {
+        onConflict: "clerk_user_id",
+        ignoreDuplicates: false,
       })
       .select()
       .single<UserRow>();
 
     if (userError || !user) {
+      console.error("[onboarding] User upsert (direct) failed:", userError?.code, userError?.message, userError?.details);
       return NextResponse.json(
         { error: userError?.message ?? "Failed to create user" },
         { status: 500 },
@@ -241,6 +255,7 @@ export async function POST(req: NextRequest) {
     );
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
+    console.error("[onboarding] POST error:", err.message, err instanceof Error ? err.stack : "");
     return NextResponse.json(
       { error: err.message },
       { status: 500 },
